@@ -1,0 +1,35 @@
+
+test_that("`simulatePowerData()` output returns expected values and structure", {
+  n <- withr::with_seed(
+    1, simulatePowerData(seq(10, 50, 2), delta = 1.2, nboot = 25)
+  )
+  delta <- withr::with_seed(
+    2, simulatePowerData(seq(0.5, 2.5, 0.1), n = 20, nboot = 25)
+  )
+  expect_s3_class(delta, "power_sim")
+  expect_s3_class(n, "power_sim")
+  expect_equal(names(delta), names(n))
+  expect_equal(names(delta), c("sim", "constant.label", "constant", "label",
+                               "variable", "sequence", "nsim", "nboot", "call"))
+  expect_equal(n$label, "Sample")
+  expect_equal(n$variable, "n")
+  expect_equal(delta$label, "Effect")
+  expect_equal(delta$variable, "delta")
+  expect_equal(n$nboot, 25)
+  expect_equal(delta$nboot, 25)
+  expect_equal(n$constant.label, "delta")
+  expect_equal(n$constant, 1.2)
+  expect_equal(n$nsim, 25)
+  expect_equal(delta$nsim, 25)
+  expect_equal(delta$constant.label, "n")
+  expect_equal(delta$constant, 20)
+  expect_equal(names(n$sim), as.character(seq(10, 50, 2)))
+  expect_equal(names(delta$sim), as.character(seq(0.5, 2.5, 0.1)))
+  expect_equal(dim(delta$sim), c(25, 21))
+  expect_equal(dim(n$sim), c(25, 21))
+  expect_equal(n$sequence, seq(10, 50, 2))
+  expect_equal(delta$sequence, seq(0.5, 2.5, 0.1))
+  # values
+  expect_equal(sum(n$sim), 307.72)
+  expect_equal(sum(delta$sim), 290.76)
+})

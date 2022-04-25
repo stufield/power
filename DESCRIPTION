@@ -1,18 +1,23 @@
 Package: power
-Title: What the Package Does (One Line, Title Case)
+Title: R Package for Basic Power Analysis (2 group)
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    person(given = "Stu",
+           family = "Field",
            role = c("aut", "cre"),
-           email = "first.last@example.com",
+           email = "stu.g.field@gmail.com",
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: MIT + file LICENSE
+Description: Informal suite of functions to calculate 2-group comparison power
+   calculations via R built in functionality or via simulation.
+Depends:
+    R (>= 4.1.0)
+Imports:
+    ggplot2
 Suggests: 
-    testthat (>= 3.0.0)
-Config/testthat/edition: 3
-Encoding: UTF-8
+    testthat,
+    withr
+License: MIT + file LICENSE
 LazyData: true
+Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
