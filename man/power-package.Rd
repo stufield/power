@@ -4,13 +4,12 @@
 \name{power-package}
 \alias{power}
 \alias{power-package}
-\title{power: R Package for Basic Power Analysis (2 group)}
+\title{power: R Package for Basic Power Analyses}
 \description{
-Informal suite of functions to calculate 2-group comparison power
-   calculations via R built in functionality or via simulation.
+Informal suite of functions to calculate simple power calculations via p-value simulation.
 }
 \author{
-\strong{Maintainer}: Stu Field \email{stu.g.field@gmail.com} (\href{https://orcid.org/YOUR-ORCID-ID}{ORCID})
+\strong{Maintainer}: Stu Field \email{stu.g.field@gmail.com} (\href{https://orcid.org/0000-0002-1024-5859}{ORCID}) [copyright holder]
 
 }
 \keyword{internal}

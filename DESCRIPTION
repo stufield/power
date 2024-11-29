@@ -1,23 +1,29 @@
 Package: power
-Title: R Package for Basic Power Analysis (2 group)
+Title: R Package for Basic Power Analyses
 Version: 0.0.0.9000
-Authors@R: 
+Authors@R: c(
     person(given = "Stu",
            family = "Field",
-           role = c("aut", "cre"),
+           role = c("aut", "cre", "cph"),
            email = "stu.g.field@gmail.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: Informal suite of functions to calculate 2-group comparison power
-   calculations via R built in functionality or via simulation.
+           comment = c(ORCID = "0000-0002-1024-5859"))
+    )
+Description: Informal suite of functions to calculate
+    simple power calculations via p-value simulation.
+License: MIT + file LICENSE
 Depends:
-    R (>= 4.1.0)
+    R (>= 4.4.0)
 Imports:
     ggplot2
 Suggests: 
     testthat,
     withr
-License: MIT + file LICENSE
-LazyData: true
+VignetteBuilder:
+    knitr
 Encoding: UTF-8
+Language: en-US
+LazyLoad: true
+Config/testthat/edition: 3
+Config/Needs/website: tidyverse/tidytemplate
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1
+RoxygenNote: 7.3.1

@@ -3,7 +3,7 @@ col_string <- c("dodgerblue", "red", "darkgreen",
                 "darkorchid4", "cyan", "orange",
                 "black", "grey", "#990066", "green", "#24135F")
 
-par.def <- list(mgp = c(2.00, 0.75, 0.00), mar = c(3, 4, 3, 1))
+par_def <- list(mgp = c(2.00, 0.75, 0.00), mar = c(3, 4, 3, 1))
 
 #' @importFrom graphics par rect
 #' @noRd
