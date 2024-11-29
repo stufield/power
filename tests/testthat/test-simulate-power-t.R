@@ -1,10 +1,10 @@
 
 test_that("`simulate_power_t()` output returns expected values and structure", {
   n <- withr::with_seed(
-    1, simulate_power_t(seq(10, 50, 2), delta = 1.2, nsim = 25)
+    1, simulate_power_t(seq(10, 50, 2), delta = 0.66, nsim = 25)
   )
   delta <- withr::with_seed(
-    2, simulate_power_t(seq(0.5, 2.5, 0.1), n = 20, nsim = 25)
+    2, simulate_power_t(seq(0.5, 2.5, 0.2), n = 20, nsim = 25)
   )
   expect_s3_class(delta, "power_sim")
   expect_s3_class(n, "power_sim")
@@ -18,18 +18,18 @@ test_that("`simulate_power_t()` output returns expected values and structure", {
   expect_equal(n$nsim, 25)
   expect_equal(delta$nsim, 25)
   expect_equal(n$constant.label, "delta")
-  expect_equal(n$constant, 1.2)
+  expect_equal(n$constant, 0.66)
   expect_equal(n$nsim, 25)
   expect_equal(delta$nsim, 25)
   expect_equal(delta$constant.label, "n")
   expect_equal(delta$constant, 20)
   expect_equal(names(n$sim), as.character(seq(10, 50, 2)))
-  expect_equal(names(delta$sim), as.character(seq(0.5, 2.5, 0.1)))
-  expect_equal(dim(delta$sim), c(25, 21))
+  expect_equal(names(delta$sim), as.character(seq(0.5, 2.5, 0.2)))
   expect_equal(dim(n$sim), c(25, 21))
+  expect_equal(dim(delta$sim), c(25, 11))
   expect_equal(n$sequence, seq(10, 50, 2))
-  expect_equal(delta$sequence, seq(0.5, 2.5, 0.1))
+  expect_equal(delta$sequence, seq(0.5, 2.5, 0.2))
   # values
-  expect_equal(sum(n$sim), 307.72)
-  expect_equal(sum(delta$sim), 290.76)
+  expect_equal(sum(n$sim), 404.44)
+  expect_equal(sum(delta$sim), 250.16)
 })

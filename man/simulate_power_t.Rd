@@ -21,7 +21,7 @@ simulate_power_t(
 \method{print}{power_sim}(x, ...)
 }
 \arguments{
-\item{sequence}{Sequence of values to vary the
+\item{sequence}{\code{numeric(n)}. A sequence of values to vary the
 appropriate variable, either \code{n} or \code{delta}.}
 
 \item{n}{\code{integer(1)}. The value for the number of samples
@@ -63,11 +63,11 @@ S3 print method for \code{power_sim} objects
 }
 \examples{
 # constant effect size
-size <- simulate_power_t(seq(10, 50, 2), delta = 0.5, nsim = 25)
+size <- simulate_power_t(seq(10, 50, 2), delta = 0.66, nsim = 25)
 size
 
 # constant sample size
-delta <- simulate_power_t(seq(0.5, 2.5, 0.1), n = 10, nsim = 25)
+delta <- simulate_power_t(seq(0.5, 2.5, 0.2), n = 10, nsim = 25)
 delta
 plot(size)
 

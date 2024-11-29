@@ -7,7 +7,7 @@
 #'
 #' @inheritParams t_test_power
 #'
-#' @param sequence Sequence of values to vary the
+#' @param sequence `numeric(n)`. A sequence of values to vary the
 #'   appropriate variable, either `n` or `delta`.
 #' @param reps `integer(1)`. Number of simulations *per box* to generate,
 #'   i.e. number of points within each simulation box.
@@ -24,11 +24,11 @@
 #'
 #' @examples
 #' # constant effect size
-#' size <- simulate_power_t(seq(10, 50, 2), delta = 0.5, nsim = 25)
+#' size <- simulate_power_t(seq(10, 50, 2), delta = 0.66, nsim = 25)
 #' size
 #'
 #' # constant sample size
-#' delta <- simulate_power_t(seq(0.5, 2.5, 0.1), n = 10, nsim = 25)
+#' delta <- simulate_power_t(seq(0.5, 2.5, 0.2), n = 10, nsim = 25)
 #' delta
 #' @importFrom stats setNames
 #' @export
@@ -53,29 +53,29 @@ simulate_power_t <- function(sequence, n = NULL, delta = NULL, nsim = 50L,
   type <- ifelse(is.null(n), "n", "delta")
   ret  <- list()
 
-  ret$sim <- lapply(sequence, function(.v) {
-    if ( verbose ) {
-      cat("* simulating: ")
-    }
-    vapply(seq(reps), function(.x) {
-           if ( verbose ) {
-             if ( .x == 1 ) {
-               cat(sprintf(ifelse(type == "n", "%02i .", "%0.1f ."), .v))
-             } else if ( .x == reps ) {
-               cat(".\n")
-             } else {
-               cat(".")
+  ret$sim <- setNames(sequence, sequence) |>
+    lapply(function(.v) {
+      if ( verbose ) {
+        cat("* simulating:",
+            sprintf(ifelse(type == "n", "%02i .", "%0.1f ."), .v))
+      }
+      vapply(seq(reps), function(.x) {
+             if ( verbose ) {
+               if ( .x == reps ) {
+                 cat(".\n")
+               } else {
+                 cat(".")
+               }
              }
-           }
-           # simulating over n (fixed delta)
-           if ( type == "n" ) {
-             t_test_power(n = .v, delta = delta, nsim = nsim, ...)
-           # simulating over delta (fixed n)
-           } else if ( type == "delta" ) {
-             t_test_power(n = n, delta = .v, nsim = nsim, ...)
-           }
-    }, double(1))
-  }) |> data.frame() |> setNames(sequence)
+             # simulating over n (fixed delta)
+             if ( type == "n" ) {
+               t_test_power(n = .v, delta = delta, nsim = nsim, ...)
+             # simulating over delta (fixed n)
+             } else if ( type == "delta" ) {
+               t_test_power(n = n, delta = .v, nsim = nsim, ...)
+             }
+      }, double(1))
+    }) |> as_tibble()
 
   ret$constant.label <- ifelse(type == "n", "delta", "n")
   ret$constant <- ifelse(type == "n", delta, n)
