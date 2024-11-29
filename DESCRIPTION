@@ -14,9 +14,11 @@ License: MIT + file LICENSE
 Depends:
     R (>= 4.4.0)
 Imports:
-    ggplot2
+    ggplot2,
+    tibble
 Suggests: 
     testthat,
+    knitr,
     dplyr,
     tidyr,
     withr
