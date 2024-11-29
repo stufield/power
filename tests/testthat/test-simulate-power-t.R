@@ -1,22 +1,22 @@
 
-test_that("`simulatePowerData()` output returns expected values and structure", {
+test_that("`simulate_power_t()` output returns expected values and structure", {
   n <- withr::with_seed(
-    1, simulatePowerData(seq(10, 50, 2), delta = 1.2, nboot = 25)
+    1, simulate_power_t(seq(10, 50, 2), delta = 1.2, nsim = 25)
   )
   delta <- withr::with_seed(
-    2, simulatePowerData(seq(0.5, 2.5, 0.1), n = 20, nboot = 25)
+    2, simulate_power_t(seq(0.5, 2.5, 0.1), n = 20, nsim = 25)
   )
   expect_s3_class(delta, "power_sim")
   expect_s3_class(n, "power_sim")
   expect_equal(names(delta), names(n))
   expect_equal(names(delta), c("sim", "constant.label", "constant", "label",
-                               "variable", "sequence", "nsim", "nboot", "call"))
+                               "variable", "sequence", "reps", "nsim"))
   expect_equal(n$label, "Sample")
   expect_equal(n$variable, "n")
   expect_equal(delta$label, "Effect")
   expect_equal(delta$variable, "delta")
-  expect_equal(n$nboot, 25)
-  expect_equal(delta$nboot, 25)
+  expect_equal(n$nsim, 25)
+  expect_equal(delta$nsim, 25)
   expect_equal(n$constant.label, "delta")
   expect_equal(n$constant, 1.2)
   expect_equal(n$nsim, 25)

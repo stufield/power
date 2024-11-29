@@ -24,7 +24,7 @@ Calculates the empirical power of a test through simulated data
 for a given effect size of sample size (per group).
 }
 \examples{
-calcEmpPower(10, 15, 1.5)
+t_test_power(10, 15, 1.5)
 }
 \seealso{
 \code{\link[=t.test]{t.test()}}, \code{\link[=qt]{qt()}}, \code{\link[=rnorm]{rnorm()}}

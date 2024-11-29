@@ -5,80 +5,76 @@
 #'   while holding sample or effect size (whichever is not
 #'   defined in `variable`) constant.
 #'
+#' @inheritParams t_test_power
+#'
 #' @param sequence Sequence of values to vary the
 #'   appropriate variable, either `n` or `delta`.
-#' @param nsim `integer(1)`. Number of simulations per box to generate,
+#' @param reps `integer(1)`. Number of simulations *per box* to generate,
 #'   i.e. number of points within each simulation box.
 #' @param n `integer(1)`. The value for the number of samples
 #'   per group to hold constant.
-#' @param delta Numeric. The value for the effect size to hold constant.
-#' @param verbose Logical. Should function be run in verbose mode?
-#' @param ... Additional arguments passed either to [calcEmpPower()],
-#' especially `nsim =`, which *must* be passed here, or to
-#' [graphics::boxplot()] if calling the generic S3 plot method.
+#' @param delta `double(1)`. The value for the effect size to hold constant.
+#' @param verbose `logical(1)`. Should function be run in verbose mode?
+#' @param ... Additional arguments passed either to [t_test_power()],
+#'   only `alpha =`, or to the S3 plotting method.
 #'
-#' @return An object of class `power_sim` which is a list containing
-#'   the results of the power simulation.
+#' @return A `power_sim` class object.
 #'
 #' @author Stu Field
 #'
 #' @examples
 #' # constant effect size
-#' # must pass nsim via '...'
-#' size <- simulatePowerData(seq(10, 50, 2), delta = 1.2, nsim = 25)
+#' size <- simulate_power_t(seq(10, 50, 2), delta = 0.5, nsim = 25)
 #' size
 #'
 #' # constant sample size
-#' delta <- simulatePowerData(seq(0.5, 2.5, 0.1), n = 20, nsim = 25)
+#' delta <- simulate_power_t(seq(0.5, 2.5, 0.1), n = 10, nsim = 25)
 #' delta
-#' @importFrom graphics title
 #' @importFrom stats setNames
 #' @export
-simulatePowerData <- function(sequence,  n = NULL, delta = NULL, reps = 25,
-                              verbose = interactive(), ...) {
-
-  if ( !"nsim" %in% names(list(...)) ) {
-    stop("Please pass a `nsim=` argument via the '...'", call. = FALSE)
-  }
+simulate_power_t <- function(sequence, n = NULL, delta = NULL, nsim = 50L,
+                             reps = 25L, verbose = interactive(), ...) {
 
   if ( missing(sequence) ) {
-    stop("The [sequence=] argument is missing:
+    stop("The `sequence =` argument is missing:
          You must provide a sequence of values for 'delta' or 'n'
-         e.g. `seq(0.2, 2.5, 0.1)`", call. = FALSE)
-  }
-
-  if ( is.null(n) + is.null(delta) == 2 ) {
-    stop("Both n and delta cannot be NULL", call. = FALSE)
-  }
-
-  if ( is.null(n) + is.null(delta) == 0 ) {
-    stop("Values for both n AND delta cannot be passed; 1 must be NULL",
+         e.g. `seq(0.2, 2.5, 0.1)`",
          call. = FALSE)
   }
 
-  type <- ifelse(is.null(n), "n", "delta")
+  if ( is.null(n) + is.null(delta) == 2 ) {
+    stop("Both n and delta cannot be `NULL`", call. = FALSE)
+  }
 
-  ret <- list()
+  if ( is.null(n) + is.null(delta) == 0 ) {
+    stop("Cannot pass *both* `n` AND `delta`.", call. = FALSE)
+  }
+
+  type <- ifelse(is.null(n), "n", "delta")
+  ret  <- list()
+
   ret$sim <- lapply(sequence, function(.v) {
-    if ( verbose ) cat("* simulating: ")
-    sapply(seq(nsim), function(.x) {
+    if ( verbose ) {
+      cat("* simulating: ")
+    }
+    vapply(seq(reps), function(.x) {
            if ( verbose ) {
              if ( .x == 1 ) {
                cat(sprintf(ifelse(type == "n", "%02i .", "%0.1f ."), .v))
-             } else if ( .x == nsim ) {
+             } else if ( .x == reps ) {
                cat(".\n")
              } else {
                cat(".")
              }
            }
-           # simulating over n; fixed delta
+           # simulating over n (fixed delta)
            if ( type == "n" ) {
-             calcEmpPower(n = .v, delta = delta, ...)
-           # simulating over delta; fixed n
+             t_test_power(n = .v, delta = delta, nsim = nsim, ...)
+           # simulating over delta (fixed n)
            } else if ( type == "delta" ) {
-             calcEmpPower(n = n, delta = .v, ...)
+             t_test_power(n = n, delta = .v, nsim = nsim, ...)
            }
-    })
+    }, double(1))
   }) |> data.frame() |> setNames(sequence)
 
   ret$constant.label <- ifelse(type == "n", "delta", "n")
@@ -87,11 +83,8 @@ simulatePowerData <- function(sequence,  n = NULL, delta = NULL, reps = 25,
   ret$variable <- type
   ret$sequence <- sequence
   ret$reps     <- reps
-  ret$nsim    <- list(...)$nsim
-  ret$call     <- match.call(expand.dots = TRUE)
-  structure(
-   ret, class = c("power_sim", class(ret))
-  )
+  ret$nsim     <- nsim
+  structure(ret, class = c("power_sim", class(ret)))
 }
 
 
@@ -99,29 +92,30 @@ simulatePowerData <- function(sequence,  n = NULL, delta = NULL, reps = 25,
 #'
 #' S3 print method for "power_sim" objects.
 #'
-#' @rdname simulatePowerData
+#' @rdname simulate_power_t
 #'
 #' @param x An object of class `power_sim`, the result of a call
-#'   to [simulatePowerData()].
+#'   to [simulate_power_t()].
 #' @param file Character. Optional file name to save file if desired.
 #'   Default is `NULL`, the default graphics device.
 #'
 #' @return A plot of power simulations.
 #' @examples
-#' sims <- powerWrapper(nsim = 20)
-#' plot(sims$n)
+#' plot(size)
+#'
+#' plot(delta)
 #' @importFrom graphics boxplot
 #' @importFrom ggplot2 alpha
 #' @export
 plot.power_sim <- function(x, ..., file = NULL) {
   withr::local_options(list(warn = -1))
-  withr::local_par(list(mar = c(4, 5, 3, 1), mgp = c(2.5, 0.75, 0)))
+  withr::local_par(par_def)
   boxplot(x$sim, col = alpha("blue", 0.75), notch = TRUE, cex.lab = 2,
           ylab = bquote(Power~(1 - beta)), ylim = 0:1,
           xlab = if ( x$variable == "n") "Sample Size (per group)" else bquote(Effect~size~(delta)),
           outpch = 21, outbg = "red", cex = 0.75, ...)
   const <- ifelse(x$variable == "n", bquote(delta), "n")
-  bquote(.(x$label) ~ "size vs Power |" ~ n[sim] == .(x$nsim) ~"|"~ n[boot] == .(x$nsim) ~"|"~ .(const) == .(x$constant)) |>
+  bquote(.(x$label) ~ "size vs Power |" ~ n[sim] == .(x$nsim) ~"|"~ n[reps] == .(x$nsim) ~"|"~ .(const) == .(x$constant)) |>
     title(cex.main = 1.5)
   add_box(0.75, 0.85, col = "darkgreen", alpha = 0.2)
   abline(h = c(0.75, 0.85), lty = 2, col = "red")
@@ -131,7 +125,7 @@ plot.power_sim <- function(x, ..., file = NULL) {
 #'
 #' S3 print method for `power_sim` objects
 #'
-#' @rdname simulatePowerData
+#' @rdname simulate_power_t
 #' @export
 print.power_sim <- function(x, ...) {
   cat("Power Simulation Info:\n\n")

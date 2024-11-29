@@ -15,12 +15,12 @@
 #' @seealso [t.test()], [qt()], [rnorm()]
 #'
 #' @examples
-#' calcEmpPower(10, 15, 1.5)
+#' t_test_power(10, 15, 1.5)
 #' @importFrom stats t.test qt rnorm
 #' @export
 t_test_power <- function(n, delta, nsim, alpha = 0.05) {
 
-  y <- rep(0:1, each = n)
+  y          <- rep(0:1, each = n)
   sims       <- replicate(nsim, c(rnorm(n, 0, 1), rnorm(n, delta, 1)))
   which_cont <- which(y == 0)
   t_vec      <- apply(sims, 2, function(.t)
