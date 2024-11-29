@@ -5,7 +5,7 @@
 \title{Plot Power Curves}
 \usage{
 plot_power_curves(
-  effect = c(0.5, 2, 0.1),
+  delta_vec = c(0.5, 2, 0.1),
   power_vec = seq(0.5, 0.9, 0.1),
   alpha = 0.05,
   bonferroni = 1000,
@@ -13,7 +13,7 @@ plot_power_curves(
 )
 }
 \arguments{
-\item{effect}{\code{numeric(n)}. Sequence of effect sizes.}
+\item{delta_vec}{\code{numeric(n)}. Sequence of effect sizes.}
 
 \item{power_vec}{\code{numeric(n)}. Sequence of powers (lines) to plot.}
 

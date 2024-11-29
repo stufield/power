@@ -18,6 +18,7 @@ Imports:
 Suggests: 
     testthat,
     dplyr,
+    tidyr,
     withr
 VignetteBuilder:
     knitr

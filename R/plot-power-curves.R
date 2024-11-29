@@ -3,7 +3,7 @@
 #' Uses [stats::power.t.test()] to generate power
 #'   values and plots of multiple power curves.
 #'
-#' @param effect `numeric(n)`. Sequence of effect sizes.
+#' @param delta_vec `numeric(n)`. Sequence of effect sizes.
 #' @param power_vec `numeric(n)`. Sequence of powers (lines) to plot.
 #' @param alpha `double(1)`. The significance, the probability of a false positive.
 #' @param bonferroni `integer(1)`. Bonferroni multiple testing correction.
@@ -16,40 +16,39 @@
 #'
 #' @examples
 #' plot_power_curves(effect = seq(0.5, 2, 0.1), power_vec = seq(0.5, 0.9, 0.1))
+
 #' @importFrom stats power.t.test
-#' @importFrom graphics axis matplot grid legend
+#' @importFrom ggplot2 guides ggplot aes geom_point geom_line
+#' @importFrom ggplot2 scale_color_manual labs guide_legend
 #' @export
-plot_power_curves <- function(effect = c(0.5, 2, 0.1),
+plot_power_curves <- function(delta_vec = c(0.5, 2, 0.1),
                               power_vec = seq(0.5, 0.9, 0.1),
                               alpha = 0.05,
                               bonferroni = 1000, main = NULL) {
 
-  mat <- sapply(power_vec, function(.b)
-                sapply(effect, function(.x)
-                       power.t.test(delta = .x, power = .b,
-                                    sig.level = alpha / bonferroni)$n))
-  dimnames(mat) <- list(sprintf("%0.2f", effect),
-                        sprintf("%0.2f", power_vec))
+  tbl_n <- expand.grid(delta_vec, power_vec) |>
+    setNames(c("delta", "power")) |>
+    apply(1, function(i) {
+      power.t.test(power = i["power"], delta = i["delta"],
+                   sig.level = 0.05 / bonferroni)$n
+    }) |> matrix(nrow = length(delta_vec),
+                 dimnames = list(NULL, sprintf("power=%0.2f", power_vec))) |>
+    cbind(delta = delta_vec) |>
+    as_tibble()
 
   if ( is.null(main) ) {
-     main <- bquote("t-test Power Curves | Bonferroni corrected ("~.(bonferroni)~")"~"|"~ alpha == .(alpha))
+     main <- bquote("Power Curves | t-test | Bonferroni corrected ("~.(bonferroni)~")"~"|"~ alpha == .(alpha))
   }
 
-  withr::local_par(par_def)
   cols <- col_string[seq_along(power_vec)]
-  matplot(mat, type = "n", axes = FALSE, main = main,
-          cex.axis = 1, cex.lab = 1, cex.main = 1,
-          xlab = "Effect Size (delta)", lwd = 1.5, lty = 1,
-          ylab = "Samples / Group (n)")
 
-  grid(col = "gray50")
-  matplot(mat, type = "b", lty = 1, pch = 21, bg = "gray", lwd = 1.5,
-          axes = FALSE, add = TRUE, col = cols)
-  axis(1, at = seq(length(effect)), labels = effect)
-  axis(2)
-  box()
-  legend("topright", legend = colnames(mat), col = cols, title = bquote(beta),
-         ncol = length(power_vec) %/% length(col_string) + 1L,
-         lty = 1, lwd = 1.5, cex = 1)
-  invisible(mat)
+  tidyr::gather(tbl_n, key = "Power", value = "y", -delta) |>
+    ggplot(aes(x = delta, y = y, color = Power)) +
+    geom_point(alpha = 0.7, size = 2, shape = 19) +
+    geom_line() +
+    scale_color_manual(values = unname(cols)) +
+    labs(x = "Effect Size (delta)",
+         y = "Samples / Group (n)",
+         title = main) +
+    guides(color = guide_legend(title = bquote(beta)))
 }
