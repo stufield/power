@@ -1,0 +1,238 @@
+---
+title: "Fisher Power Curve"
+author: "Stu Field"
+date: today
+date-format: "D MMMM YYYY"
+format:
+  html:
+    number-sections: true
+    colorlinks: true
+ # pdf:
+ #   number-sections: true
+ #   colorlinks: true
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#| label: setup
+#| include: FALSE
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment  = "#>",
+  fig.path = "figures/power-fisher-"
+)
+library(withr)
+library(tibble)
+library(ggplot2)
+```
+
+
+# Overview
+
+This analysis concentrates on the power analysis and curve
+generation of the Fisher's Exact test for count data.
+The test testing the null of independence of rows and
+columns in a contingency table with fixed margins.
+
+In general, once you choose the proportion of the first group,
+counts in column 1 of the 2x2 contingency table, you must
+then choose the *difference* from that proportion for the second
+group to determine the "effect" you are attempting to detect.
+Once chosen, you can then generate a power curve, which
+varies the (paired) group size and determines the power for
+a given effect size, proportion, and significance level
+(default $\alpha = 0.05$). Power is estimated via simulation
+whereby `nsim` simulations are drawn from a `rbinom()` distribution
+with the specified parameters ($p1$, $p2$, $n1$, $n2$) and
+a call to `fisher.test()` determines the p-value. The estimated
+power is the proportion of the simulated *p*-values less
+than $\alpha$ given a *known* effect reflected in the 2x2
+contingency table.
+
+--------------
+
+
+## Functionality
+
+There are 3 primary functions:
+
+- `fisher_sim()`: calculates the simulated power for a given
+  set of parameters (`p1`, `p2`, `n1`, `n2`) and number of
+  simulations (`nsim`)
+- `power_curve()`: generates a power curve while varying sample
+  size on the `x` axis, and determining the corresponding power
+  through simulation using `fisher_sim()`.
+
+
+### Generate Power Curve
+
+```{r}
+#| label: power-sim
+#' @param p1 first proportion (group 1)
+#' @param p2 second proportion (group 2)
+#' @param n1 group 1 sample size (column 1)
+#' @param n2 group 2 sample size (column 2)
+#' @param nsim number of simulations to perform in calculating power.
+#' @param alpha significance level for p-values.
+#' @param ... Passed to [fisher.test()], e.g. `alternative`.
+fisher_sim <- function(p1, p2, n1, n2, nsim = 200L, alpha = 0.05, ...) {
+  y1 <- rbinom(nsim, n1, p1)
+  y2 <- rbinom(nsim, n2, p2)
+  m  <- cbind(y1, n1 - y1, y2, n2 - y2)
+  mean(
+    apply(m, 1, function(.x) {
+      fisher.test(matrix(.x, ncol = 2L), ...)$p.value
+    }) < alpha
+  )
+}
+
+# example power calculation for single sample size `n`
+# p1 = 0.85; p1 = 0.75
+n <- 200
+fisher_sim(0.85, 0.75, n, n)
+```
+
+### Generate Power Curve
+
+Power curves are typically used to visualize the relationship
+between sample size and power. This can then be used to establish
+a reasonable sample size for a desired (80%?) power of the proposed
+experiment assuming an acceptable Type II error.
+(failing to detect an actual difference).
+
+```{r}
+#| label: power-curve
+#' @param n `integer(n)`. A vector of sample sizes per group.
+#' @param p `double(1)`. Binomial probability of group 1 (the base group).
+#' @param p_diff `double(1)` in [-1, 1]. The difference from `p`
+#'   of group 2. Can be negative.
+#' @param ... Passed to [fisher_sim()], e.g. `nsim`.
+power_curve <- function(n, p = 0.85, p_diff = -0.1, ...) {
+  tibble::tibble(
+    n     = n,
+    power = vapply(n, function(.x) {
+      fisher_sim(p1 = p, p2 = p + p_diff, n1 = .x, n2 = .x, ...)
+    }, 0.1)
+  )
+}
+
+# create seq of `x` values for curve
+nvec <- seq(50, 500, by = 5)
+
+# simulate power for each `x`
+power_tbl <- withr::with_seed(1, power_curve(nvec))
+power_tbl
+```
+
+### Plot Power Curve
+
+Plotting is straight-forward via `ggplot`.
+
+```{r}
+#| label: plot-power-curve
+gg <- power_tbl |>
+  ggplot(aes(x = n, y = power)) +
+  geom_point(alpha = 0.7, col = "#24135F") +
+  geom_smooth(formula = y ~ x, method = "loess") +
+  ggtitle("Fisher's Exact Power Curve") +
+  labs(x = "Counts per Group", y = bquote(Power~(1-beta)))
+gg
+```
+
+
+### Fit loess polynomial
+
+As visualized above, a local polynomial fit can be easily fit to
+the simulated power data varying with sample size to estimate
+the relationship, and predict power from any arbitrary sample size `n`.
+
+
+```{r}
+#| label: fit-local-polynomial
+fit <- loess(power ~ n, data = power_tbl)
+fit
+```
+
+
+### Solve for n
+
+However, the inverse question is much more common ... what
+sample size would be required to detect a specified
+difference (effect) a specified proportion (80%) of the
+time (i.e. power)?
+
+The code below is a bit hacky, as inverting a polynomial can be
+tricky, however, the approach is to define an objective function
+`fn()` that uses the `loess` model fit to generate predictions
+in `y` for given values of `x` (`power` given `n`). Since
+we know the function is monotonically increasing, we can
+threshold this objective function at the specified power and
+use the `optimize()` function to determine where in `n` the `power`
+is maximized. This provides the sample size for a given power.
+
+
+```{r}
+#| label: solve-for-n
+solve_n <- function(pwr) {
+  fn <- function(n) {   # objective function
+    y <- predict(fit, data.frame(n = n))
+    ifelse(y <= pwr, y, -y)
+  }
+  range <- range(as.numeric(fit$x))
+  opt <- optimize(fn, interval = range, maximum = TRUE)
+  c(power = unname(opt$objective), n = opt$maximum)
+}
+
+pwr_n <- solve_n(0.8)
+pwr_n
+```
+
+Alternatively we can use the `stats::approx()` function to
+linearly interpolate at a specified location in the `y` variable
+to determine the corresponding `x`. The advantage here is that
+`approx()` does not assume a monotonic response. However, since
+we *know* the power curve is monotonically increasing as it
+approaches $y = 1$, the results are highly similar.
+
+```{r}
+#| label: alternative-approx
+approx(x = fit$fitted, y = power_tbl$n, xout = 0.8) |>
+  unlist()
+```
+
+### Add `n` to Power Curve
+
+```{r}
+#| label: re-plot-curve
+gg +
+  annotate("segment",
+    x        = c(pwr_n[["n"]], min(power_tbl$n)),
+    xend     = c(pwr_n[["n"]],pwr_n[["n"]]),
+    y        = c(min(power_tbl$power), pwr_n[["power"]]),
+    yend     = c(pwr_n[["power"]], pwr_n[["power"]]),
+    linetype = "dashed", colour = "#00A499")
+```
+
+
+
+### Misc. Code
+
+Extra code not used above but possibly useful in the future.
+
+```{r}
+#| label: extra-code
+#| eval: FALSE
+plot(power_tbl$n, power_tbl$power)
+lines(power_tbl$n, predict(fit, data.frame(x = power_tbl$n)), col = "red")
+
+# fit non-linear least squares (rather than loess)
+nls_fit <- nls(
+  y ~ (x + b) / (x + a)^d,
+  start = list(a = 10, b = 1, d = 0.1),
+  data = data.frame(x = power_tbl$n, y = power_tbl$power)
+)
+
+plot(power_tbl$n, power_tbl$power)
+lines(power_tbl$n, predict(nls_fit, data.frame(x = power_tbl$n)), col = "red")
+```
