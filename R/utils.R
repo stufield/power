@@ -2,14 +2,14 @@
 col_string <- c(
   purple     = "#24135F",
   lightgreen = "#00A499",
-  lightgrey = "#707372",
-  magenta   = "#840B55",
-  lightblue = "#006BA6",
-  yellow    = "#D69A2D",
-  darkgreen = "#007A53",
-  darkblue  = "#1B365D",
-  darkgrey  = "#54585A",
-  blue = "#004C97"
+  lightgrey  = "#707372",
+  magenta    = "#840B55",
+  lightblue  = "#006BA6",
+  yellow     = "#D69A2D",
+  darkgreen  = "#007A53",
+  darkblue   = "#1B365D",
+  darkgrey   = "#54585A",
+  blue       = "#004C97"
 )
 
 
@@ -17,7 +17,7 @@ par_def <- list(mgp = c(2.00, 0.75, 0.00), mar = c(3, 4, 3, 1))
 
 #' @importFrom graphics par rect
 #' @noRd
-addBox <- function(bottom = NULL, top = NULL, left = NULL, right = NULL,
+add_box <- function(bottom = NULL, top = NULL, left = NULL, right = NULL,
                    col, alpha = 0.2, ...) {
   if (is.null(bottom))
     bottom <- par("usr")[3L]
@@ -30,29 +30,3 @@ addBox <- function(bottom = NULL, top = NULL, left = NULL, right = NULL,
   rect(left, bottom, right, top, border = NA, col = ggplot2::alpha(col, alpha))
 }
 
-#' @importFrom grDevices pdf png postscript jpeg dev.off
-#' @noRd
-figure <- function(file, height = 9, width = 9, scale = 1, res = 300, ...) {
-  if (is.null(file)) {
-    return(invisible(NULL))
-  }
-  if (grepl("\\.pdf$", file)) {
-    pdf(file = file, height = height * scale, width = width * scale,
-        useDingbats = FALSE, title = sub("\\.pdf$", "", basename(file)), ...)
-  }
-  else if (grepl("\\.png$", file)) {
-    png(filename = file, height = height * scale, width = width * scale,
-        units = "in", res = res, ...)
-  }
-  else if (grepl("\\.eps$", file)) {
-    postscript(file = file, height = height * scale * 100,
-               width = width * scale * 100, horizontal = FALSE,
-               onefile = FALSE, paper = "special", ...)
-  }
-  else if (grepl("\\.jpeg$", file)) {
-    jpeg(filename = file, height = height * 500, width = width * 500, res = 600, ...)
-  }
-  else {
-    stop("Could not find file extension in provided file path: ", file, call. = FALSE)
-  }
-}
