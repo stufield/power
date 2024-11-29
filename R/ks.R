@@ -15,7 +15,6 @@
 #'
 #' @examples
 #' ks2delta(0.45)
-#' ks2delta(25)
 #' @importFrom stats qnorm
 #' @export
 ks2delta <- function(x) {

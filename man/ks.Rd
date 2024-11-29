@@ -68,7 +68,6 @@ is a varying sensitivity/specificity value.
 }
 \examples{
 ks2delta(0.45)
-ks2delta(25)
 table <- ks_power_table()
 table
 # S3 plot method
