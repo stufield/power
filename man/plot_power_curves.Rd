@@ -24,17 +24,17 @@ plot_power_curves(
 \item{main}{\code{character(1)}. Optional title.}
 }
 \value{
-A plot.
+A \code{ggplot}.
 }
 \description{
 Uses \code{\link[stats:power.t.test]{stats::power.t.test()}} to generate power
 values and plots of multiple power curves.
 }
 \examples{
-plot_power_curves(effect = seq(0.5, 2, 0.1), power_vec = seq(0.5, 0.9, 0.1))
+plot_power_curves(delta_vec = seq(0.5, 2, 0.1), power_vec = seq(0.5, 0.9, 0.1))
 }
 \seealso{
-\code{\link[stats:power.t.test]{stats::power.t.test()}}, \code{\link[graphics:matplot]{graphics::matplot()}}
+\code{\link[stats:power.t.test]{stats::power.t.test()}}
 }
 \author{
 Stu Field

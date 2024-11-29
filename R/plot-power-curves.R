@@ -9,14 +9,13 @@
 #' @param bonferroni `integer(1)`. Bonferroni multiple testing correction.
 #' @param main `character(1)`. Optional title.
 #'
-#' @return A plot.
+#' @return A `ggplot`.
 #' @author Stu Field
 #'
-#' @seealso [stats::power.t.test()], [graphics::matplot()]
+#' @seealso [stats::power.t.test()]
 #'
 #' @examples
-#' plot_power_curves(effect = seq(0.5, 2, 0.1), power_vec = seq(0.5, 0.9, 0.1))
-
+#' plot_power_curves(delta_vec = seq(0.5, 2, 0.1), power_vec = seq(0.5, 0.9, 0.1))
 #' @importFrom stats power.t.test
 #' @importFrom ggplot2 guides ggplot aes geom_point geom_line
 #' @importFrom ggplot2 scale_color_manual labs guide_legend
