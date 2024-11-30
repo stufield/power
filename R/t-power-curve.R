@@ -105,20 +105,21 @@ t_power_curve <- function(sequence, n = NULL, delta = NULL, nsim = 50L,
 #'
 #' plot(delta)
 #' @importFrom graphics boxplot
-#' @importFrom ggplot2 alpha
+#' @importFrom ggplot2 alpha geom_boxplot labs geom_hline
 #' @export
 plot.t_power_curve <- function(x, ..., file = NULL) {
-  withr::local_options(list(warn = -1))
-  withr::local_par(par_def)
-  boxplot(x$sim, col = alpha("blue", 0.75), notch = TRUE, cex.lab = 1.25,
-          ylab = bquote(Power~(1 - beta)), ylim = 0:1,
-          xlab = if ( x$variable == "n") "Sample Size (per group)" else bquote(Effect~size~(delta)),
-          outpch = 21, outbg = "red", cex = 0.75, ...)
   const <- ifelse(x$variable == "n", bquote(delta), "n")
   title <- bquote(.(x$label) ~ "size vs Power |" ~ n[sim] == .(x$nsim) ~"|"~ n[reps] == .(x$nsim) ~"|"~ .(const) == .(x$constant))
-  title(title, cex.main = 1.25)
-  add_box(0.75, 0.85, col = "darkgreen", alpha = 0.2)
-  abline(h = c(0.75, 0.85), lty = 2, col = "red")
+
+  x$sim |>
+    tidyr::gather(key = "x", value = "y") |>
+    ggplot(aes(x = x, y = y)) +
+    geom_boxplot(alpha = 0.5, notch = FALSE, fill = col_string["purple"]) +
+    labs(y = bquote(Power~(1 - beta)),
+         x = if ( x$variable == "n") "Sample Size (per group)" else bquote(Effect~size~(delta))) +
+    ggtitle(title) +
+    geom_hline(yintercept = c(0.75, 0.85), linetype = "dashed",
+               color = col_string["lightblue"])
 }
 
 #' Print Power Simulation Object
