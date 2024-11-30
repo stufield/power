@@ -41,7 +41,7 @@ of group 2. Can be negative.}
 \description{
 Fisher Exact Power
 
-Fisher Power Curve
+Create a Power Curve for Fisher's Exact
 }
 \section{Functions}{
 \itemize{

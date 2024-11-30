@@ -6,8 +6,8 @@ test_that("`t_power_curve()` output returns expected values and structure", {
   delta <- withr::with_seed(
     2, t_power_curve(seq(0.5, 2.5, 0.2), n = 20, nsim = 25)
   )
-  expect_s3_class(delta, "power_sim")
-  expect_s3_class(n, "power_sim")
+  expect_s3_class(delta, "t_power_curve")
+  expect_s3_class(n, "t_power_curve")
   expect_equal(names(delta), names(n))
   expect_equal(names(delta), c("sim", "constant.label", "constant", "label",
                                "variable", "sequence", "reps", "nsim"))

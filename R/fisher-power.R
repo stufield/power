@@ -25,7 +25,7 @@ fisher_power <- function(p1, p2, n1, n2, nsim = 200L, alpha = 0.05, ...) {
 
 
 
-#' Fisher Power Curve
+#' Create a Power Curve for Fisher's Exact
 #'
 #' @describeIn fisher_power
 #'   Generates data for a power curve where power is estimated

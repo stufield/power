@@ -1,6 +1,6 @@
-#' Create Power Simulation Data Frame
+#' Create Power Curve for t-tests
 #'
-#' Create a data frame containing the power for either
+#' Create a power curve from simulated data for either
 #'   a given set of sample size or effect size values (`variable`),
 #'   while holding sample or effect size (whichever is not
 #'   defined in `variable`) constant.
@@ -31,6 +31,7 @@
 #' delta <- t_power_curve(seq(0.5, 2.5, 0.2), n = 10, nsim = 25)
 #' delta
 #' @importFrom stats setNames
+#' @importFrom helpr signal_info add_class
 #' @export
 t_power_curve <- function(sequence, n = NULL, delta = NULL, nsim = 50L,
                           reps = 25L, verbose = interactive(), ...) {
@@ -56,17 +57,12 @@ t_power_curve <- function(sequence, n = NULL, delta = NULL, nsim = 50L,
   ret$sim <- setNames(sequence, sequence) |>
     lapply(function(.v) {
       if ( verbose ) {
-        cat("* simulating:",
-            sprintf(ifelse(type == "n", "%02i .", "%0.1f ."), .v))
+        signal_info(
+          "Simulating:",
+          sprintf(ifelse(type == "n", "%02i", "%0.1f"), .v)
+        )
       }
       vapply(seq(reps), function(.x) {
-             if ( verbose ) {
-               if ( .x == reps ) {
-                 cat(".\n")
-               } else {
-                 cat(".")
-               }
-             }
              # simulating over n (fixed delta)
              if ( type == "n" ) {
                t_test_power(n = .v, delta = delta, nsim = nsim, ...)
@@ -84,11 +80,11 @@ t_power_curve <- function(sequence, n = NULL, delta = NULL, nsim = 50L,
   ret$sequence <- sequence
   ret$reps     <- reps
   ret$nsim     <- nsim
-  structure(ret, class = c("t_power_curve", class(ret)))
+  add_class(ret, "t_power_curve")
 }
 
 
-#' Plot Power Simulation Data
+#' Plot Power Curve Object
 #'
 #' S3 print method for "t_power_curve" objects.
 #'
@@ -96,10 +92,9 @@ t_power_curve <- function(sequence, n = NULL, delta = NULL, nsim = 50L,
 #'
 #' @param x An object of class `t_power_curve`, the result of a call
 #'   to [t_power_curve()].
-#' @param file Character. Optional file name to save file if desired.
-#'   Default is `NULL`, the default graphics device.
 #'
-#' @return A plot of power simulations.
+#' @return A ggplot of boxplots.
+#'
 #' @examples
 #' plot(size)
 #'
@@ -107,7 +102,7 @@ t_power_curve <- function(sequence, n = NULL, delta = NULL, nsim = 50L,
 #' @importFrom graphics boxplot
 #' @importFrom ggplot2 alpha geom_boxplot labs geom_hline
 #' @export
-plot.t_power_curve <- function(x, ..., file = NULL) {
+plot.t_power_curve <- function(x, ...) {
   const <- ifelse(x$variable == "n", bquote(delta), "n")
   title <- bquote(.(x$label) ~ "size vs Power |" ~ n[sim] == .(x$nsim) ~"|"~ n[reps] == .(x$nsim) ~"|"~ .(const) == .(x$constant))
 
@@ -122,26 +117,29 @@ plot.t_power_curve <- function(x, ..., file = NULL) {
                color = col_string["lightblue"])
 }
 
-#' Print Power Simulation Object
+#' Print Power Curve Object
 #'
 #' S3 print method for `t_power_curve` objects
 #'
 #' @rdname t_power_curve
+#'
+#' @importFrom helpr symbl signal_rule value add_style
 #' @export
 print.t_power_curve <- function(x, ...) {
-  cat("Power Simulation Info:\n\n")
-  left <- c("Simulation table dims",
-            "Simulations per Power calculation",
-            "Simulating across (varying)",
-            "Varying sequence",
+  signal_rule("t-test Power Curve Simulation", line_col = "blue")
+  left <- c("Simulation table",
+            "Simulations per calculation",
+            "Repeats per sim (per box)",
             "Constant",
-            "Simulation repeats") |> encodeString(width = 35, justify = "left")
+            "Simulating across (varying)",
+            "Varying sequence") |> encodeString(width = 35, justify = "left")
   right <- c(paste(dim(x$sim), collapse = " x "),
              x$nsim,
-             x$variable,
-             paste(x$sequence, collapse = ","),
+             x$reps,
              paste0(x$constant.label, " = ", x$constant),
-             x$nsim)
-  writeLines(paste(left, right))
+             x$variable,
+             value(x$sequence))
+  writeLines(paste(add_style$red(symbl$bullet), left, right))
+  signal_rule(line_col= "green", lty = "double")
   invisible(x)
 }
