@@ -1,10 +1,10 @@
 
-test_that("`simulate_power_t()` output returns expected values and structure", {
+test_that("`t_power_curve()` output returns expected values and structure", {
   n <- withr::with_seed(
-    1, simulate_power_t(seq(10, 50, 2), delta = 0.66, nsim = 25)
+    1, t_power_curve(seq(10, 50, 2), delta = 0.66, nsim = 25)
   )
   delta <- withr::with_seed(
-    2, simulate_power_t(seq(0.5, 2.5, 0.2), n = 20, nsim = 25)
+    2, t_power_curve(seq(0.5, 2.5, 0.2), n = 20, nsim = 25)
   )
   expect_s3_class(delta, "power_sim")
   expect_s3_class(n, "power_sim")
