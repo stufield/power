@@ -2,9 +2,9 @@
 % Please edit documentation in R/t-test-power.R
 \name{t_test_power}
 \alias{t_test_power}
-\title{Calculate Empirical t-test Power}
+\title{t-test Empirical Power}
 \usage{
-t_test_power(n, delta, nsim, alpha = 0.05)
+t_test_power(n, delta, nsim, alpha = 0.05, ...)
 }
 \arguments{
 \item{n}{\code{integer(1)}. The sample size.}
@@ -15,6 +15,9 @@ t_test_power(n, delta, nsim, alpha = 0.05)
 in estimating \eqn{1 - \beta}.}
 
 \item{alpha}{\code{double(1)}. The significance threshold (\eqn{\alpha}).}
+
+\item{...}{Passed to the underlying test, i.e. \code{\link[=fisher.test]{fisher.test()}},
+\code{\link[=t.test]{t.test()}}, etc.,  e.g. \verb{alternative =}.}
 }
 \value{
 The value of the empirically calculated power (\eqn{1 - \beta}).

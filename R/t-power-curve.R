@@ -19,6 +19,7 @@
 #'   only `alpha =`, or to the S3 plotting method.
 #'
 #' @return A `t_power_curve` class object.
+#' @seealso [fisher_power_curve()]
 #'
 #' @author Stu Field
 #'

@@ -70,6 +70,9 @@ plot(size)
 
 plot(delta)
 }
+\seealso{
+\code{\link[=fisher_power_curve]{fisher_power_curve()}}
+}
 \author{
 Stu Field
 }
