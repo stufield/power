@@ -14,6 +14,7 @@
 #' fisher_power(0.8, 0.7, 100, 100)
 #'
 #' fisher_power(0.6, 0.7, 50, 60)
+#' @importFrom stats fisher.test rbinom
 #' @export
 fisher_power <- function(p1, p2, n1, n2, nsim = 200L, alpha = 0.05, ...) {
   y1 <- rbinom(nsim, n1, p1)

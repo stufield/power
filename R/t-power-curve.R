@@ -101,7 +101,7 @@ print.t_power_curve <- function(x, ...) {
             "Constant",
             "Varying",
             "Sequence") |> pad(width = 25)
-  right <- c(paste(dim(x$sim), collapse = " x "),
+  right <- c(paste(dim(x$tbl), collapse = " x "),
              x$nsim,
              x$reps,
              paste0(x$constant.label, " = ", x$constant),
@@ -134,7 +134,7 @@ plot.t_power_curve <- function(x, ...) {
   const <- ifelse(x$variable == "n", bquote(delta), "n")
   title <- bquote(.(x$label) ~ "size vs Power |" ~ n[sim] == .(x$nsim) ~"|"~ n[reps] == .(x$nsim) ~"|"~ .(const) == .(x$constant))
 
-  x$sim |>
+  x$tbl |>
     tidyr::gather(key = "x", value = "y") |>
     ggplot(aes(x = x, y = y)) +
     geom_boxplot(alpha = 0.5, notch = FALSE, fill = col_string["purple"]) +

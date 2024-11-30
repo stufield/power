@@ -36,7 +36,7 @@ solve_n.default <- function(x, pwr) {
 # This is the primary method
 # A tibble with `n` and `power` columns
 #' @noRd
-#' @importFrom stats loess
+#' @importFrom stats loess optimize predict
 #' @export
 solve_n.tbl_df <- function(x, pwr) {
   fit <- loess(power ~ n, data = x)

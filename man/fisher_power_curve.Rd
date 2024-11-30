@@ -24,6 +24,8 @@ of group 2. Can be negative.}
 in estimating \eqn{1 - \beta}.}
 
 \item{...}{Passed to \code{\link[=fisher_power]{fisher_power()}}.}
+
+\item{x}{A \code{fisher_power_curve} class object.}
 }
 \description{
 Generates data for a power curve where power is empirically

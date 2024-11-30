@@ -58,7 +58,7 @@ ks2delta <- function(x) {
 #' table <- ks_power_table()
 #' table
 #' @importFrom stats power.t.test
-#' @importFrom tibble as_tibble
+#' @importFrom tibble as_tibble enframe
 #' @export
 ks_power_table <- function(power = seq(0.6, 0.95, 0.05),
                            n_vec = seq(20, 100, 10),
@@ -68,7 +68,7 @@ ks_power_table <- function(power = seq(0.6, 0.95, 0.05),
   ss_names  <- sprintf("%s/%s", ss * 100, ss * 100)
   ks_v      <- c(ss + ss) - 1    # vector of ks distances corresponding to ss
   delta_vec <- ks2delta(ks_v)    # vector: effect sizes corresponding to ks dist
-  base <- tibble::enframe(setNames(ks_v, ss_names), name = "SS", value = "KS")
+  base <- enframe(setNames(ks_v, ss_names), name = "SS", value = "KS")
 
   tbl_n <- expand.grid(delta_vec, power) |>
     setNames(c("delta", "power")) |>
@@ -116,7 +116,7 @@ ks_power_table <- function(power = seq(0.6, 0.95, 0.05),
 #' # S3 plot method
 #' plot(table)
 #' plot(table, plot_power = FALSE)
-#' @importFrom graphics matplot abline grid axis box
+#' @importFrom graphics matplot abline grid axis box legend
 #' @export
 plot.ks_pwr_table <- function(x, plot_power = TRUE, ...) {
 

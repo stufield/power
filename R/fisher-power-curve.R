@@ -34,6 +34,8 @@ fisher_power_curve <- function(n, p = 0.85, p_diff = -0.1, nsim = 200L, ...) {
 #'
 #' @rdname fisher_power_curve
 #'
+#' @param x A `fisher_power_curve` class object.
+#'
 #' @importFrom ggplot2 ggplot aes geom_point geom_smooth ggtitle labs
 #' @importFrom helpr symbl signal_rule value add_style pad
 #' @export

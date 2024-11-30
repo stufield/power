@@ -18,10 +18,11 @@ Imports:
     ggplot2,
     tibble
 Suggests: 
-    testthat,
+    rmarkdown,
     knitr,
     dplyr,
     tidyr,
+    testthat,
     withr
 VignetteBuilder:
     knitr
