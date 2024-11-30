@@ -87,12 +87,7 @@ power_tbl
 Plotting is straight-forward via `ggplot`.
 
 ```{r plot-power-curve}
-gg <- power_tbl |>
-  ggplot(aes(x = n, y = power)) +
-  geom_point(alpha = 0.7, col = "#24135F") +
-  geom_smooth(formula = y ~ x, method = "loess") +
-  ggtitle("Fisher's Exact Power Curve") +
-  labs(x = "Counts per Group", y = bquote(Power~(1-beta)))
+gg <- plot(power_tbl)
 gg
 ```
 
