@@ -2,9 +2,15 @@
 % Please edit documentation in R/fisher-power.R
 \name{fisher_power}
 \alias{fisher_power}
+\alias{fisher_power_curve}
+\alias{solve_n}
 \title{Fisher Exact Power}
 \usage{
 fisher_power(p1, p2, n1, n2, nsim = 200L, alpha = 0.05, ...)
+
+fisher_power_curve(n, p = 0.85, p_diff = -0.1, ...)
+
+solve_n(pwr_tbl, pwr)
 }
 \arguments{
 \item{p1}{first proportion (group 1)}
@@ -19,8 +25,41 @@ fisher_power(p1, p2, n1, n2, nsim = 200L, alpha = 0.05, ...)
 
 \item{alpha}{significance level for p-values.}
 
-\item{...}{Passed to \code{\link[=fisher.test]{fisher.test()}}, e.g. \code{alternative}.}
+\item{...}{Passed to \code{\link[=fisher_power]{fisher_power()}}, e.g. \code{nsim}.}
+
+\item{n}{\code{integer(n)}. A vector of sample sizes per group.}
+
+\item{p}{\code{double(1)}. Binomial probability of group 1 (the base group).}
+
+\item{p_diff}{\code{double(1)} in \verb{[-1, 1]}. The difference from \code{p}
+of group 2. Can be negative.}
+
+\item{pwr_tbl}{A \code{pwr_tbl} object. Call from \code{\link[=fisher_power_curve]{fisher_power_curve()}}.}
+
+\item{pwr}{\code{double(1)}in \verb{[-1, 1]}. The power to be interpolated.}
 }
 \description{
 Fisher Exact Power
+
+Fisher Power Curve
+}
+\section{Functions}{
+\itemize{
+\item \code{fisher_power_curve()}: Generates data for a power curve where power is estimated
+over a range of sample size values.
+
+\item \code{solve_n()}: Solver for a specific power value.
+
+}}
+\examples{
+fisher_power(0.8, 0.7, 100, 100)
+
+tbl <- fisher_power_curve(seq(50, 400, 25))
+tbl
+
+solve_n(tbl, 0.85)
+
+solve_n(tbl, 0.75)
+
+solve_n(tbl, 0.55)
 }

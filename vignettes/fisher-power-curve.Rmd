@@ -1,28 +1,19 @@
 ---
-title: "Fisher Power Curve"
+title: "Power Curve: Fisher's Exact"
 author: "Stu Field"
-date: today
-date-format: "D MMMM YYYY"
-format:
-  html:
-    number-sections: true
-    colorlinks: true
- # pdf:
- #   number-sections: true
- #   colorlinks: true
-editor_options: 
-  chunk_output_type: console
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Power Curve: Fisher's Exact}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
-```{r}
-#| label: setup
-#| include: FALSE
+```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment  = "#>",
-  fig.path = "figures/power-fisher-"
+  comment  = "#>"
 )
-library(withr)
+library(power)
 library(tibble)
 library(ggplot2)
 ```
@@ -57,40 +48,21 @@ contingency table.
 
 There are 3 primary functions:
 
-- `fisher_sim()`: calculates the simulated power for a given
+- `fisher_power()`: calculates the simulated power for a given
   set of parameters (`p1`, `p2`, `n1`, `n2`) and number of
   simulations (`nsim`)
-- `power_curve()`: generates a power curve while varying sample
+- `fisher_power_curve()`: generates a power curve while varying sample
   size on the `x` axis, and determining the corresponding power
-  through simulation using `fisher_sim()`.
+  through simulation using `fisher_power()`.
 
 
 ### Generate Power Curve
 
-```{r}
-#| label: power-sim
-#' @param p1 first proportion (group 1)
-#' @param p2 second proportion (group 2)
-#' @param n1 group 1 sample size (column 1)
-#' @param n2 group 2 sample size (column 2)
-#' @param nsim number of simulations to perform in calculating power.
-#' @param alpha significance level for p-values.
-#' @param ... Passed to [fisher.test()], e.g. `alternative`.
-fisher_sim <- function(p1, p2, n1, n2, nsim = 200L, alpha = 0.05, ...) {
-  y1 <- rbinom(nsim, n1, p1)
-  y2 <- rbinom(nsim, n2, p2)
-  m  <- cbind(y1, n1 - y1, y2, n2 - y2)
-  mean(
-    apply(m, 1, function(.x) {
-      fisher.test(matrix(.x, ncol = 2L), ...)$p.value
-    }) < alpha
-  )
-}
-
+```{r power-power}
 # example power calculation for single sample size `n`
 # p1 = 0.85; p1 = 0.75
 n <- 200
-fisher_sim(0.85, 0.75, n, n)
+fisher_power(0.85, 0.75, n, n)
 ```
 
 ### Generate Power Curve
@@ -101,27 +73,12 @@ a reasonable sample size for a desired (80%?) power of the proposed
 experiment assuming an acceptable Type II error.
 (failing to detect an actual difference).
 
-```{r}
-#| label: power-curve
-#' @param n `integer(n)`. A vector of sample sizes per group.
-#' @param p `double(1)`. Binomial probability of group 1 (the base group).
-#' @param p_diff `double(1)` in [-1, 1]. The difference from `p`
-#'   of group 2. Can be negative.
-#' @param ... Passed to [fisher_sim()], e.g. `nsim`.
-power_curve <- function(n, p = 0.85, p_diff = -0.1, ...) {
-  tibble::tibble(
-    n     = n,
-    power = vapply(n, function(.x) {
-      fisher_sim(p1 = p, p2 = p + p_diff, n1 = .x, n2 = .x, ...)
-    }, 0.1)
-  )
-}
-
+```{r power-curve}
 # create seq of `x` values for curve
 nvec <- seq(50, 500, by = 5)
 
 # simulate power for each `x`
-power_tbl <- withr::with_seed(1, power_curve(nvec))
+power_tbl <- withr::with_seed(1, fisher_power_curve(nvec))
 power_tbl
 ```
 
@@ -129,8 +86,7 @@ power_tbl
 
 Plotting is straight-forward via `ggplot`.
 
-```{r}
-#| label: plot-power-curve
+```{r plot-power-curve}
 gg <- power_tbl |>
   ggplot(aes(x = n, y = power)) +
   geom_point(alpha = 0.7, col = "#24135F") +
@@ -148,8 +104,7 @@ the simulated power data varying with sample size to estimate
 the relationship, and predict power from any arbitrary sample size `n`.
 
 
-```{r}
-#| label: fit-local-polynomial
+```{r fit-local-polynomial}
 fit <- loess(power ~ n, data = power_tbl)
 fit
 ```
@@ -172,19 +127,8 @@ use the `optimize()` function to determine where in `n` the `power`
 is maximized. This provides the sample size for a given power.
 
 
-```{r}
-#| label: solve-for-n
-solve_n <- function(pwr) {
-  fn <- function(n) {   # objective function
-    y <- predict(fit, data.frame(n = n))
-    ifelse(y <= pwr, y, -y)
-  }
-  range <- range(as.numeric(fit$x))
-  opt <- optimize(fn, interval = range, maximum = TRUE)
-  c(power = unname(opt$objective), n = opt$maximum)
-}
-
-pwr_n <- solve_n(0.8)
+```{r solve-for-n}
+pwr_n <- solve_n(power_tbl, pwr = 0.8)
 pwr_n
 ```
 
@@ -203,8 +147,7 @@ approx(x = fit$fitted, y = power_tbl$n, xout = 0.8) |>
 
 ### Add `n` to Power Curve
 
-```{r}
-#| label: re-plot-curve
+```{r re-plot-curve}
 gg +
   annotate("segment",
     x        = c(pwr_n[["n"]], min(power_tbl$n)),
@@ -220,9 +163,7 @@ gg +
 
 Extra code not used above but possibly useful in the future.
 
-```{r}
-#| label: extra-code
-#| eval: FALSE
+```{r extra-code, eval = FALSE}
 plot(power_tbl$n, power_tbl$power)
 lines(power_tbl$n, predict(fit, data.frame(x = power_tbl$n)), col = "red")
 
