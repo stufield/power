@@ -17,10 +17,10 @@
 #' @seealso [t.test()], [qt()], [rnorm()]
 #'
 #' @examples
-#' t_test_power(10, 0.5, 25)
+#' t_test_power(10, 0.5)
 #' @importFrom stats t.test qt rnorm
 #' @export
-t_test_power <- function(n, delta, nsim, alpha = 0.05, ...) {
+t_test_power <- function(n, delta, nsim = 200L, alpha = 0.05, ...) {
 
   y    <- rep(0:1L, each = n)
   sims <- replicate(nsim, c(rnorm(n, 0, 1), rnorm(n, delta, 1)))

@@ -20,6 +20,7 @@ efficiently returns the sample size
 for a given power.
 }
 \examples{
+tbl <- fisher_power_curve(seq(50, 400, 25))
 solve_n(tbl, 0.85)
 
 solve_n(tbl, 0.75)

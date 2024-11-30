@@ -4,7 +4,7 @@
 \alias{t_test_power}
 \title{t-test Empirical Power}
 \usage{
-t_test_power(n, delta, nsim, alpha = 0.05, ...)
+t_test_power(n, delta, nsim = 200L, alpha = 0.05, ...)
 }
 \arguments{
 \item{n}{\code{integer(1)}. The sample size.}
@@ -27,7 +27,7 @@ Calculates the empirical power of a test through simulated data
 for a given effect size of sample size (per group).
 }
 \examples{
-t_test_power(10, 0.5, 25)
+t_test_power(10, 0.5)
 }
 \seealso{
 \code{\link[=t.test]{t.test()}}, \code{\link[=qt]{qt()}}, \code{\link[=rnorm]{rnorm()}}

@@ -34,7 +34,7 @@
 #' @importFrom stats setNames
 #' @importFrom helpr signal_info add_class
 #' @export
-t_power_curve <- function(sequence, n = NULL, delta = NULL, nsim = 50L,
+t_power_curve <- function(sequence, n = NULL, delta = NULL, nsim = 200L,
                           reps = 25L, verbose = interactive(), ...) {
 
   if ( missing(sequence) ) {
@@ -55,7 +55,7 @@ t_power_curve <- function(sequence, n = NULL, delta = NULL, nsim = 50L,
   type <- ifelse(is.null(n), "n", "delta")
   ret  <- list()
 
-  ret$sim <- setNames(sequence, sequence) |>
+  ret$tbl <- setNames(sequence, sequence) |>
     lapply(function(.v) {
       if ( verbose ) {
         signal_info(
@@ -81,17 +81,44 @@ t_power_curve <- function(sequence, n = NULL, delta = NULL, nsim = 50L,
   ret$sequence <- sequence
   ret$reps     <- reps
   ret$nsim     <- nsim
-  add_class(ret, "t_power_curve")
+  add_class(ret, c("t_power_curve", paste0("class_", type)))
 }
 
 
-#' Plot Power Curve Object
+#' Print Power Curve Object
 #'
-#' S3 print method for "t_power_curve" objects.
+#' S3 print method for `t_power_curve` objects
 #'
 #' @rdname t_power_curve
 #'
-#' @param x An object of class `t_power_curve`, the result of a call
+#' @importFrom helpr symbl signal_rule value add_style pad
+#' @export
+print.t_power_curve <- function(x, ...) {
+  signal_rule("t-test Power Curve Simulation", line_col = "blue")
+  left <- c("Sim table",
+            "Sims per calculation",
+            "Repeats per sim (per box)",
+            "Constant",
+            "Varying",
+            "Sequence") |> pad(width = 25)
+  right <- c(paste(dim(x$sim), collapse = " x "),
+             x$nsim,
+             x$reps,
+             paste0(x$constant.label, " = ", x$constant),
+             x$variable,
+             value(x$sequence))
+  writeLines(paste(add_style$red(symbl$bullet), left, right))
+  signal_rule(line_col= "green", lty = "double")
+  invisible(x)
+}
+
+#' Plot Power Curve Object
+#'
+#' S3 plot method for "t_power_curve" objects.
+#'
+#' @rdname t_power_curve
+#'
+#' @param x A `t_power_curve` class object, the result of a call
 #'   to [t_power_curve()].
 #'
 #' @return A ggplot of boxplots.
@@ -116,31 +143,4 @@ plot.t_power_curve <- function(x, ...) {
     ggtitle(title) +
     geom_hline(yintercept = c(0.75, 0.85), linetype = "dashed",
                color = col_string["lightblue"])
-}
-
-#' Print Power Curve Object
-#'
-#' S3 print method for `t_power_curve` objects
-#'
-#' @rdname t_power_curve
-#'
-#' @importFrom helpr symbl signal_rule value add_style
-#' @export
-print.t_power_curve <- function(x, ...) {
-  signal_rule("t-test Power Curve Simulation", line_col = "blue")
-  left <- c("Simulation table",
-            "Simulations per calculation",
-            "Repeats per sim (per box)",
-            "Constant",
-            "Simulating across (varying)",
-            "Varying sequence") |> encodeString(width = 35, justify = "left")
-  right <- c(paste(dim(x$sim), collapse = " x "),
-             x$nsim,
-             x$reps,
-             paste0(x$constant.label, " = ", x$constant),
-             x$variable,
-             value(x$sequence))
-  writeLines(paste(add_style$red(symbl$bullet), left, right))
-  signal_rule(line_col= "green", lty = "double")
-  invisible(x)
 }

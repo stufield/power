@@ -2,23 +2,23 @@
 % Please edit documentation in R/t-power-curve.R
 \name{t_power_curve}
 \alias{t_power_curve}
-\alias{plot.t_power_curve}
 \alias{print.t_power_curve}
+\alias{plot.t_power_curve}
 \title{Create Power Curve for t-tests}
 \usage{
 t_power_curve(
   sequence,
   n = NULL,
   delta = NULL,
-  nsim = 50L,
+  nsim = 200L,
   reps = 25L,
   verbose = interactive(),
   ...
 )
 
-\method{plot}{t_power_curve}(x, ...)
-
 \method{print}{t_power_curve}(x, ...)
+
+\method{plot}{t_power_curve}(x, ...)
 }
 \arguments{
 \item{sequence}{\code{numeric(n)}. A sequence of values to vary the
@@ -40,7 +40,7 @@ i.e. number of points within each simulation box.}
 \item{...}{Additional arguments passed either to \code{\link[=t_test_power]{t_test_power()}},
 only \verb{alpha =}, or to the S3 plotting method.}
 
-\item{x}{An object of class \code{t_power_curve}, the result of a call
+\item{x}{A \code{t_power_curve} class object, the result of a call
 to \code{\link[=t_power_curve]{t_power_curve()}}.}
 }
 \value{
@@ -54,9 +54,9 @@ a given set of sample size or effect size values (\code{variable}),
 while holding sample or effect size (whichever is not
 defined in \code{variable}) constant.
 
-S3 print method for "t_power_curve" objects.
-
 S3 print method for \code{t_power_curve} objects
+
+S3 plot method for "t_power_curve" objects.
 }
 \examples{
 # constant effect size

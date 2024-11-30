@@ -2,10 +2,13 @@
 % Please edit documentation in R/fisher-power-curve.R
 \name{fisher_power_curve}
 \alias{fisher_power_curve}
+\alias{print.fisher_power_curve}
 \alias{plot.fisher_power_curve}
 \title{Create a Power Curve for Fisher's Exact}
 \usage{
-fisher_power_curve(n, p = 0.85, p_diff = -0.1, ...)
+fisher_power_curve(n, p = 0.85, p_diff = -0.1, nsim = 200L, ...)
+
+\method{print}{fisher_power_curve}(x, ...)
 
 \method{plot}{fisher_power_curve}(x, ...)
 }
@@ -17,16 +20,24 @@ fisher_power_curve(n, p = 0.85, p_diff = -0.1, ...)
 \item{p_diff}{\code{double(1)} in \verb{[-1, 1]}. The difference from \code{p}
 of group 2. Can be negative.}
 
-\item{...}{Passed to \code{\link[=fisher_power]{fisher_power()}}, e.g. \code{nsim}.}
+\item{nsim}{\code{integer(1)}. Number of simulations to perform
+in estimating \eqn{1 - \beta}.}
+
+\item{...}{Passed to \code{\link[=fisher_power]{fisher_power()}}.}
 }
 \description{
 Generates data for a power curve where power is empirically
 estimated over a range of sample size values.
+
+S3 print method for \code{fisher_power_curve} objects.
+
+S3 plot method for \code{fisher_power_curve} objects.
 }
 \examples{
-tbl <- fisher_power_curve(seq(50, 400, 25))
+tbl <- fisher_power_curve(seq(50, 400, 10), nsim = 100L)
 tbl
 
+plot(tbl)
 }
 \seealso{
 \code{\link[=t_power_curve]{t_power_curve()}}
