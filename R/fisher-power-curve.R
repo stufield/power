@@ -83,11 +83,3 @@ plot.fisher_power_curve <- function(x, ...) {
 }
 
 
-#gg +
-#  annotate("segment",
-#    x        = c(pwr_n[["n"]], min(power_tbl$n)),
-#    xend     = c(pwr_n[["n"]],pwr_n[["n"]]),
-#    y        = c(min(power_tbl$power), pwr_n[["power"]]),
-#    yend     = c(pwr_n[["power"]], pwr_n[["power"]]),
-#    linetype = "dashed", colour = "#00A499")
-

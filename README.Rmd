@@ -4,37 +4,66 @@ output: github_document
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-```{r, include = FALSE}
+```{r setup, include = FALSE}
+options(width = 100)
+Sys.setlocale("LC_COLLATE", "en_US.UTF-8") # ensure common sorting envir
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
   out.width = "100%"
 )
+ver <- desc::desc_get_version(".")
+ver <- paste0("https://img.shields.io/badge/Version-", ver,
+              "-success.svg?style=flat&logo=github")
 ```
 
 # The power package
 
 <!-- badges: start -->
+![GitHub version](`r ver`)
+[![CRAN status](http://www.r-pkg.org/badges/version/power)](https://cran.r-project.org/package=power)
+[![R-CMD-check](https://github.com/stufield/power/workflows/R-CMD-check/badge.svg)](https://github.com/stufield/power/actions)
+[![](https://cranlogs.r-pkg.org/badges/grand-total/power)](https://cran.r-project.org/package=power)
+[![Codecov test coverage](https://codecov.io/gh/stufield/power/branch/main/graph/badge.svg)](https://app.codecov.io/gh/stufield/power?branch=main)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://choosealicense.com/licenses/mit/)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![CRAN status](https://www.r-pkg.org/badges/version/power)](https://CRAN.R-project.org/package=power)
 <!-- badges: end -->
 
 
-The goal of the `power` package is to ...
+The `power` package contains some simple functions to empirically
+simulate and estimate statistical power under various statistical
+test conditions. In general, simulations are performed with *known*
+effect sizes or differences, and the proportion of detected significant
+*p*-values represents the empirical power, i.e. $1 - \beta$ or 
+`1 - TypeII` error.
+
+The goal is typically get an idea of the required sample size
+given an experimental design, statistical test, effect size, and 
+desired power.
+
+
+---------------
+
 
 ## Installation
 
-You can install the released version of power from [CRAN](https://CRAN.R-project.org) with:
+The `power` package is not currently on [CRAN](https://CRAN.R-project.org)
+but you can install the latest version from 
+[github](https://github.com/stufield/power) via:
 
-``` r
+```{r install-github, eval = FALSE}
 remotes::install_github("stufield/power")
+
+# OR
+
+remotes::install_version("stufield/power", "0.0.1")
 ```
+
 
 ## Loading `power`
 
-
-```{r example}
+```{r load}
 library(power)
 ```
 
@@ -42,28 +71,87 @@ library(power)
 ## Plot power curves
 
 ```{r curves, fig.height = 6, fig.width = 11}
-plotPowerCurves(effect = seq(0.5, 2, 0.1), power.vec = seq(0.5, 0.9, 0.1))
+plot_power_curves(delta_vec = seq(0.5, 2, 0.1),
+                  power_vec = seq(0.5, 0.9, 0.1))
 ```
 
-## Plot power simulations
 
-```{r sim-n, fig.height = 6, fig.width = 11}
-# constant effect size
-# must pass `nboot=`
-set.seed(1)
-size <- simulatePowerData(seq(10, 50, 2), delta = 1.2, nboot = 25)
-size
+## Two-Group Empirical Power via Simulation
 
-# plot
-plot(size)
+```{r power-curve-n, fig.height = 6, fig.width = 11}
+# constant effect size (delta)
+size_tbl <- withr::with_seed(1,
+  t_power_curve(seq(10, 50, 2), delta = 0.75, nsim = 25L)
+)
+size_tbl
+
+plot(size_tbl)
 ```
 
-```{r sim-d, fig.height = 6, fig.width = 11}
-# constant sample size
-set.seed(2)
-delta <- simulatePowerData(seq(0.5, 2.5, 0.1), n = 20, nboot = 25)
-delta
+```{r power-curve-d, fig.height = 6, fig.width = 11}
+# constant sample size (n)
+delta_tbl <- withr::with_seed(2,
+  t_power_curve(seq(0.5, 2.5, 0.1), n = 10, nsim = 25L)
+)
+delta_tbl
 
-# plot
-plot(delta)
+plot(delta_tbl)
 ```
+
+## Solve for Sample Size
+
+To solve for the sample size given a corresponding power value
+you must have simulate power keeping "delta" (effect size) constant
+and varying `n`. For example, the `size_tbl` object created above:
+
+```{r solve-n}
+solve_n(size_tbl, 0.8)
+```
+
+
+
+## Fisher's Exact for Count Data
+
+For count data, Fisher's Exact tests assume a 2x2 contingency 
+matrix and equal proportions across the margins (rows x cols):
+
+```{r fisher-power}
+fisher_power(0.85, 0.75, 200, 200, nsim = 200L)
+```
+
+## Fisher's Power Curve
+
+```{r fisher-curve}
+f_tbl <- fisher_power_curve(seq(50, 500, 10), p = 0.8, p_diff = -0.1, nsim = 200L)
+f_tbl
+```
+
+
+### Plot the Power Curve
+```{r plot-fisher-curve, fig.height = 6, fig.width = 11}
+gg_pwr <- plot(f_tbl)
+gg_pwr
+```
+
+### Solve for `n`
+
+```{r solve-n-fisher}
+pwr_n <- solve_n(f_tbl, 0.8)
+pwr_n
+```
+
+### Solve for `n`
+
+Visually check the curve:
+
+```{r plot-fisher-curve2, fig.height = 6, fig.width = 11}
+gg_pwr +
+  ggplot2::annotate("segment",
+    x        = c(pwr_n[["n"]], min(f_tbl$n)),
+    xend     = c(pwr_n[["n"]],pwr_n[["n"]]),
+    y        = c(min(f_tbl$power), pwr_n[["power"]]),
+    yend     = c(pwr_n[["power"]], pwr_n[["power"]]),
+    linetype = "dashed", colour = "#00A499")
+```
+
+
