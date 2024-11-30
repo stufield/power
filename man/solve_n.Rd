@@ -4,10 +4,11 @@
 \alias{solve_n}
 \title{Solve for \code{n} at specific power value.}
 \usage{
-solve_n(pwr_tbl, pwr)
+solve_n(x, pwr)
 }
 \arguments{
-\item{pwr_tbl}{A \code{pwr_tbl} object.}
+\item{x}{A "power_curve" object. See \code{\link[=fisher_power_curve]{fisher_power_curve()}}
+or \code{\link[=t_power_curve]{t_power_curve()}}.}
 
 \item{pwr}{\code{double(1)} in \verb{(0, 1)}.
 The power to be interpolated.}
