@@ -11,6 +11,8 @@ utils::globalVariables(
     "n",
     "y",
     "delta",
+    "KS",
+    "SS",
     "Power",
     "power"
   )
