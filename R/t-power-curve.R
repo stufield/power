@@ -31,31 +31,30 @@
 #' # constant sample size
 #' delta <- t_power_curve(seq(0.5, 2.5, 0.2), n = 10, nsim = 25)
 #' delta
-#' @importFrom stats setNames
-#' @importFrom helpr signal_info add_class
+#' @importFrom helpr signal_info add_class set_Names
 #' @export
 t_power_curve <- function(sequence, n = NULL, delta = NULL, nsim = 200L,
                           reps = 25L, verbose = interactive(), ...) {
 
   if ( missing(sequence) ) {
     stop("The `sequence =` argument is missing:
-         You must provide a sequence of values for 'delta' or 'n'
+         You must provide a sequence of values for `delta` or `n`
          e.g. `seq(0.2, 2.5, 0.1)`",
          call. = FALSE)
   }
 
-  if ( is.null(n) + is.null(delta) == 2 ) {
+  if ( is.null(n) && is.null(delta) ) {
     stop("Both n and delta cannot be `NULL`", call. = FALSE)
   }
 
-  if ( is.null(n) + is.null(delta) == 0 ) {
+  if ( !(is.null(n) || is.null(delta)) ) {
     stop("Cannot pass *both* `n` AND `delta`.", call. = FALSE)
   }
 
   type <- ifelse(is.null(n), "n", "delta")
   ret  <- list()
 
-  ret$tbl <- setNames(sequence, sequence) |>
+  ret$tbl <- set_Names(sequence) |>
     lapply(function(.v) {
       if ( verbose ) {
         signal_info(
