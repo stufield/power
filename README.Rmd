@@ -63,6 +63,8 @@ remotes::install_version("stufield/power", "0.0.1")
 
 ## Loading `power`
 
+Loading the `power` package is as simple as:
+
 ```{r load}
 library(power)
 ```
@@ -70,13 +72,42 @@ library(power)
 
 ## Plot power curves
 
-```{r curves, fig.height = 6, fig.width = 11}
-plot_power_curves(delta_vec = seq(0.5, 2, 0.1),
-                  power_vec = seq(0.5, 0.9, 0.1))
+The simplest way to generally plot power curves is via `plot_power_curves()`
+which uses `power.t.test()` under the hood:
+
+```{r plot-power-curves, fig.height = 6, fig.width = 11}
+plot_power_curves(
+  delta_vec = seq(0.5, 2, 0.1),
+  power_vec = seq(0.5, 0.9, 0.1)
+)
+```
+
+## Power curves and KS-distance
+
+There is a loose "rule-of-thumb" relationship between Sensitivity/Specificity
+and KS-distance, and of course, KS is related to effect size. So we
+can visualize this relationship also via a standard power curve:
+
+```{r ks-curves, fig.height = 6, fig.width = 11}
+ks_tables <- ks_power_table()
+ks_tables
+
+# `power` as y-axis
+plot(ks_tables)
+
+# `n` as y-axis
+plot(ks_tables, plot_power = FALSE)
 ```
 
 
-## Two-Group Empirical Power via Simulation
+-------------
+
+
+## Two-Groups
+### Empirical Power via Simulation
+
+A more robust (?) empirical calculation of power can be
+generated via simulation:
 
 ```{r power-curve-n, fig.height = 6, fig.width = 11}
 # constant effect size (delta)
@@ -98,7 +129,7 @@ delta_tbl
 plot(delta_tbl)
 ```
 
-## Solve for Sample Size
+### Solve for Sample Size
 
 To solve for the sample size given a corresponding power value
 you must have simulate power keeping "delta" (effect size) constant
@@ -119,10 +150,11 @@ matrix and equal proportions across the margins (rows x cols):
 fisher_power(0.85, 0.75, 200, 200, nsim = 200L)
 ```
 
-## Fisher's Power Curve
+### Fisher's Power Curve
 
 ```{r fisher-curve}
-f_tbl <- fisher_power_curve(seq(50, 500, 10), p = 0.8, p_diff = -0.1, nsim = 200L)
+f_tbl <- fisher_power_curve(seq(50, 400, 5), p = 0.85, p_diff = -0.1,
+                            nsim = 200L)
 f_tbl
 ```
 
@@ -140,9 +172,9 @@ pwr_n <- solve_n(f_tbl, 0.8)
 pwr_n
 ```
 
-### Solve for `n`
 
-Visually check the curve:
+Visually check the curve and add the solution to the `ggplot`.
+
 
 ```{r plot-fisher-curve2, fig.height = 6, fig.width = 11}
 gg_pwr +
@@ -153,5 +185,3 @@ gg_pwr +
     yend     = c(pwr_n[["power"]], pwr_n[["power"]]),
     linetype = "dashed", colour = "#00A499")
 ```
-
-
