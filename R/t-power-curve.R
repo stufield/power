@@ -130,15 +130,17 @@ print.t_power_curve <- function(x, ...) {
 #' @importFrom ggplot2 alpha geom_boxplot labs geom_hline
 #' @export
 plot.t_power_curve <- function(x, ...) {
-  const <- ifelse(x$variable == "n", bquote(delta), "n")
-  title <- bquote(.(x$label) ~ "size vs Power |" ~ n[sim] == .(x$nsim) ~"|"~ n[reps] == .(x$nsim) ~"|"~ .(const) == .(x$constant))
+  const <- ifelse(x$variable == "delta", "n", bquote(delta))
+  xlev  <- x$sequence
+  title <- bquote(.(x$label) ~ "Size vs Power |"~italic(t)-test~"|"~ n[sim] == .(x$nsim) ~"|"~ n[reps] == .(x$nsim) ~"|"~ .(const) == .(x$constant))
+  xlab  <- switch(x$variable, delta = bquote(Effect~size~(delta)),
+                  n = "Sample Size (per group)")
 
   x$tbl |>
     tidyr::gather(key = "x", value = "y") |>
-    ggplot(aes(x = x, y = y)) +
+    ggplot(aes(x = factor(x, levels = xlev), y = y)) +
     geom_boxplot(alpha = 0.5, notch = FALSE, fill = col_string["purple"]) +
-    labs(y = bquote(Power~(1 - beta)),
-         x = if ( x$variable == "n") "Sample Size (per group)" else bquote(Effect~size~(delta))) +
+    labs(y = bquote(Power~(1 - beta)), x = xlab) +
     ggtitle(title) +
     geom_hline(yintercept = c(0.75, 0.85), linetype = "dashed",
                color = col_string["lightblue"])
