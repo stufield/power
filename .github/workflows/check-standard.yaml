@@ -65,6 +65,7 @@ jobs:
             any::knitr
             any::remotes
             any::rmarkdown
+            github::stufield/helpr
           needs: check
 
       - uses: r-lib/actions/check-r-package@v2
