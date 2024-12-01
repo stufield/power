@@ -26,7 +26,7 @@ plot_power_curves <- function(delta_vec = c(0.5, 2, 0.1),
                               bonferroni = 1000, main = NULL) {
 
   tbl_n <- expand.grid(delta_vec, power_vec) |>
-    setNames(c("delta", "power")) |>
+    set_Names(c("delta", "power")) |>
     apply(1, function(i) {
       power.t.test(power = i["power"], delta = i["delta"],
                    sig.level = 0.05 / bonferroni)$n
@@ -45,7 +45,9 @@ plot_power_curves <- function(delta_vec = c(0.5, 2, 0.1),
     ggplot(aes(x = delta, y = y, color = Power)) +
     geom_point(alpha = 0.7, size = 2, shape = 19) +
     geom_line() +
-    scale_color_manual(values = unname(cols)) +
+    scale_color_manual(
+      values = unname(cols),
+      labels = function(x) gsub(".*=", "", x)) +
     labs(x = "Effect Size (delta)",
          y = "Samples / Group (n)",
          title = main) +
