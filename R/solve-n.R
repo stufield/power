@@ -43,7 +43,7 @@ solve_n.tbl_df <- function(x, pwr) {
   min_pwr <- min(fit$fitted)
   max_pwr <- max(fit$fitted)
   if ( pwr < min_pwr || pwr > max_pwr ) {
-    stop("`pwr` is outside of interpolated range: ", pwr, call. = FALSE)
+    stop("`pwr` is outside of the interpolated range: ", pwr, call. = FALSE)
   }
   fn <- function(x) {  # objective function
     y <- unname(predict(fit, data.frame(n = x)))
