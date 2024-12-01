@@ -32,11 +32,11 @@ ks2delta <- function(x) {
 #'
 #' @rdname ks
 #'
-#' @param power `numeric(n)`. Which level(s) of power to
-#'   evaluate the required samples size.
+#' @param power `numeric(n)` in \verb{(0, 1)}. Which level(s)
+#'   of power to evaluate the required samples size.
 #' @param n_vec `integer(n)`. Which sample sizes per group
 #'   to evaluate the corresponding power.
-#' @param bonferroni `integer(1)`. The Bonferroni correction to apply.
+#' @param bonferroni `integer(1)`. Optional Bonferroni correction to apply.
 #'
 #' @return A list of:
 #'   \item{n}{A data frame of the number of samples required in each
@@ -57,21 +57,22 @@ ks2delta <- function(x) {
 #' @examples
 #' table <- ks_power_table()
 #' table
+#' @importFrom helpr set_Names
 #' @importFrom stats power.t.test
 #' @importFrom tibble as_tibble enframe
 #' @export
 ks_power_table <- function(power = seq(0.6, 0.95, 0.05),
                            n_vec = seq(20, 100, 10),
-                           bonferroni = 1000) {
+                           bonferroni = 1) {
 
   ss        <- seq(0.6, 0.9, by = 0.01) # sens/spec vector
   ss_names  <- sprintf("%s/%s", ss * 100, ss * 100)
   ks_v      <- c(ss + ss) - 1    # vector of ks distances corresponding to ss
   delta_vec <- ks2delta(ks_v)    # vector: effect sizes corresponding to ks dist
-  base <- enframe(setNames(ks_v, ss_names), name = "SS", value = "KS")
+  base <- enframe(set_Names(ks_v, ss_names), name = "SS", value = "KS")
 
   tbl_n <- expand.grid(delta_vec, power) |>
-    setNames(c("delta", "power")) |>
+    set_Names(c("delta", "power")) |>
     apply(1, function(i) {
     power.t.test(n = NULL, power = i["power"], delta = i["delta"],
                  sig.level = 0.05 / bonferroni)$n
@@ -80,7 +81,7 @@ ks_power_table <- function(power = seq(0.6, 0.95, 0.05),
     as_tibble()
 
   tbl_pwr <- expand.grid(delta_vec, n_vec) |>
-    setNames(c("delta", "n")) |>
+    set_Names(c("delta", "n")) |>
     apply(1, function(i) {
     power.t.test(power = NULL, n = i["n"], delta = i["delta"],
                  sig.level = 0.05 / bonferroni)$power
@@ -111,7 +112,7 @@ ks_power_table <- function(power = seq(0.6, 0.95, 0.05),
 #'
 #' @param plot_power `logical(1)`. Should the `power` data frame be plotted?
 #'   If `FALSE`, the sample sizes are plotted.
-#' @param ... Additional arguments passed to [graphics::matplot()]
+#' @param ... Additional arguments as requpred by the [plot()] generic.
 #' @examples
 #' # S3 plot method
 #' plot(table)

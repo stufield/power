@@ -11,7 +11,7 @@ ks2delta(x)
 ks_power_table(
   power = seq(0.6, 0.95, 0.05),
   n_vec = seq(20, 100, 10),
-  bonferroni = 1000
+  bonferroni = 1
 )
 
 \method{plot}{ks_pwr_table}(x, plot_power = TRUE, ...)
@@ -21,18 +21,18 @@ ks_power_table(
 Or a \code{ks_pwr_table} object, from call to \code{\link[=ks_power_table]{ks_power_table()}},
 which is a \code{tibble} with \code{n} and \code{power}.}
 
-\item{power}{\code{numeric(n)}. Which level(s) of power to
-evaluate the required samples size.}
+\item{power}{\code{numeric(n)} in \verb{(0, 1)}. Which level(s)
+of power to evaluate the required samples size.}
 
 \item{n_vec}{\code{integer(n)}. Which sample sizes per group
 to evaluate the corresponding power.}
 
-\item{bonferroni}{\code{integer(1)}. The Bonferroni correction to apply.}
+\item{bonferroni}{\code{integer(1)}. Optional Bonferroni correction to apply.}
 
 \item{plot_power}{\code{logical(1)}. Should the \code{power} data frame be plotted?
 If \code{FALSE}, the sample sizes are plotted.}
 
-\item{...}{Additional arguments passed to \code{\link[graphics:matplot]{graphics::matplot()}}}
+\item{...}{Additional arguments as requpred by the \code{\link[=plot]{plot()}} generic.}
 }
 \value{
 Effect sizes corresponding to \code{x}.
@@ -72,6 +72,7 @@ table <- ks_power_table()
 table
 # S3 plot method
 plot(table)
+
 plot(table, plot_power = FALSE)
 }
 \seealso{
