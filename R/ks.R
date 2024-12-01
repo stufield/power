@@ -115,12 +115,12 @@ ks_power_table <- function(power = seq(0.6, 0.95, 0.05),
 #' @examples
 #' # S3 plot method
 #' plot(table)
+#'
 #' plot(table, plot_power = FALSE)
-#' @importFrom graphics matplot abline grid axis box legend
+#' @importFrom ggplot2 ggplot aes geom_line geom_point guides labs
+#' @importFrom ggplot2 guide_legend scale_color_manual guide_axis
 #' @export
 plot.ks_pwr_table <- function(x, plot_power = TRUE, ...) {
-
-  withr::local_par(par_def)
 
   if ( plot_power ) {
     x <- x$power
@@ -128,31 +128,26 @@ plot.ks_pwr_table <- function(x, plot_power = TRUE, ...) {
     x <- x$n
   }
 
-  ss <- x$SS
-  x  <- x[, !names(x) %in% c("SS", "KS"), drop = FALSE]
-
   if ( plot_power ) {
     y_lab <- bquote(Power~(1-beta))
-    title <- "Sample Size"
+    legend_title <- "Sample Size"
   } else {
     y_lab <- "Sample Size (per group)"
-    title <- expression(1 - beta)
+    legend_title <- bquote(1-beta)
   }
+  main <- sprintf("%s vs. Sensitivity/Specificity",
+                 ifelse(plot_power, "Statistical Power", "Sample Size"))
+  levs <- grep("^n=|^power=", names(x), value = TRUE)
 
-  matplot(x, type = "n", axes = FALSE,
-          main = sprintf("%s vs. Sensitivity/Specificity",
-                         ifelse(plot_power, "Statistical Power", "Sample Size")),
-          xlab = "Sens/Spec", ylab = y_lab)
-
-  grid(nx = 0, ny = NULL, col = "gray60")
-  abline(v = seq(1, nrow(x), by = 5), col = "gray60", lty = 3)
-  matplot(x, type = "l", pch = 20, axes = FALSE, add = TRUE,
-          col = col_string, lty = 1, lwd = 1.5, ...)
-  axis(1, at = seq(1, nrow(x), by = 5),
-       labels = ss[seq(1, nrow(x), by = 5)])
-  axis(2)
-  box()
-  legend(ifelse(plot_power, "bottomright", "topright"),
-         legend = gsub(".*=", "", names(x)), title = title,
-         col = col_string, lty = 1, ncol = 2, lwd = 2)
+  tidyr::gather(x, key = "Power", value = "y", -SS, -KS) |>
+    ggplot(aes(x = SS, y = y, color = factor(Power, levs),
+               group = factor(Power, levs))) +
+    geom_point(alpha = 0.7, size = 2, shape = 19) +
+    geom_line() +
+    scale_color_manual(
+      values = unname(col_string),
+      labels = function(x) gsub(".*=", "", x)) +
+    labs(x = "Sens/Spec", y = y_lab, title = main) +
+    guides(color = guide_legend(title = legend_title),
+           x = ggplot2::guide_axis(angle = 45))
 }
