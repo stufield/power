@@ -33,6 +33,7 @@ jobs:
         with:
           extra-packages: |
             any::pkgdown
+            github::stufield/helpr
             local::.
           needs: website
 
