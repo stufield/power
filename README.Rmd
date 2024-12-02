@@ -54,10 +54,6 @@ but you can install the latest version from
 
 ```{r install-github, eval = FALSE}
 remotes::install_github("stufield/power")
-
-# OR
-
-remotes::install_version("stufield/power", "0.0.1")
 ```
 
 
