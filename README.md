@@ -39,10 +39,6 @@ version from [github](https://github.com/stufield/power) via:
 
 ``` r
 remotes::install_github("stufield/power")
-
-# OR
-
-remotes::install_version("stufield/power", "0.0.1")
 ```
 
 ## Loading `power`
@@ -229,7 +225,7 @@ gg_pwr
 pwr_n <- solve_n(f_tbl, 0.8)
 pwr_n
 #>   power       n 
-#>   0.800 270.386
+#>   0.800 265.899
 ```
 
 Visually check the curve and add the solution to the `ggplot`.
