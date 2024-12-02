@@ -8,18 +8,20 @@ plot_power_curves(
   delta_vec = c(0.5, 2, 0.1),
   power_vec = seq(0.5, 0.9, 0.1),
   alpha = 0.05,
-  bonferroni = 1000,
   main = NULL
 )
 }
 \arguments{
-\item{delta_vec}{\code{numeric(n)}. Sequence of effect sizes.}
+\item{delta_vec}{\code{numeric(n)}. A sequence of effect sizes
+to evaluate the corresponding power.}
 
-\item{power_vec}{\code{numeric(n)}. Sequence of powers (lines) to plot.}
+\item{power_vec}{\code{numeric(n)} in \verb{(0, 1)}. A sequence of
+power levels to evaluate the required samples size.}
 
-\item{alpha}{\code{double(1)}. The significance, the probability of a false positive.}
-
-\item{bonferroni}{\code{integer(1)}. Bonferroni multiple testing correction.}
+\item{alpha}{\code{double(1)}. The significance threshold (\eqn{\alpha}),
+the probability of a significant result given the null hypothesis,
+i.e. a false positive. If desired, Bonferroni correction should
+be implemented here.}
 
 \item{main}{\code{character(1)}. Optional title.}
 }
@@ -31,7 +33,8 @@ Uses \code{\link[stats:power.t.test]{stats::power.t.test()}} to generate power
 values and plots of multiple power curves.
 }
 \examples{
-plot_power_curves(delta_vec = seq(0.5, 2, 0.1), power_vec = seq(0.5, 0.9, 0.1))
+plot_power_curves(delta_vec = seq(0.5, 2, 0.1),
+                  power_vec = seq(0.5, 0.9, 0.1))
 }
 \seealso{
 \code{\link[stats:power.t.test]{stats::power.t.test()}}

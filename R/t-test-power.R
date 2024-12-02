@@ -3,11 +3,8 @@
 #' Calculates the empirical power of a test through simulated data
 #'   for a given effect size of sample size (per group).
 #'
-#' @param n `integer(1)`. The sample size.
-#' @param delta `numeric(1)`. The effect size.
-#' @param nsim `integer(1)`. Number of simulations to perform
-#'   in estimating \eqn{1 - \beta}.
-#' @param alpha `double(1)`. The significance threshold (\eqn{\alpha}).
+#' @inheritParams params
+#'
 #' @param ... Passed to the underlying test, i.e. [fisher.test()],
 #'   [t.test()], etc.,  e.g. `alternative =`.
 #'

@@ -3,13 +3,13 @@
 #' Generates data for a power curve where power is empirically
 #'   estimated over a range of sample size values.
 #'
-#' @inheritParams fisher_power
+#' @inheritParams params
 #'
-#' @param n `integer(n)`. A vector of sample sizes per group.
 #' @param p `double(1)`. Binomial probability of group 1 (the base group).
-#' @param p_diff `double(1)` in \verb{[-1, 1]}. The difference from `p`
+#' @param p_diff `double(1)` in \verb{(-1, 1)}. The difference from `p`
 #'   of group 2. Can be negative.
-#' @param ... Passed to [fisher_power()].
+#' @param ... Arguments passed to [fisher_power()].
+#'
 #' @examples
 #' tbl <- fisher_power_curve(seq(50, 400, 10), nsim = 100L)
 #' tbl
@@ -17,12 +17,12 @@
 #' @seealso [t_power_curve()]
 #' @importFrom helpr add_class
 #' @export
-fisher_power_curve <- function(n, p = 0.85, p_diff = -0.1, nsim = 200L, ...) {
+fisher_power_curve <- function(n_vec, p = 0.85, p_diff = -0.1, nsim = 200L, ...) {
   tibble::tibble(
-    n     = n,
-    power = vapply(n, function(.x) {
+    n     = n_vec,
+    power = vapply(n_vec, function(.x) {
       fisher_power(p1 = p, p2 = p + p_diff, n1 = .x, n2 = .x, nsim = nsim, ...)
-    }, 0.1)
+    }, double(1))
   ) |>
     add_class("fisher_power_curve") |>
     structure(nsim = nsim, p = p, p_diff = p_diff)

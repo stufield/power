@@ -24,13 +24,12 @@ t_power_curve(
 \item{sequence}{\code{numeric(n)}. A sequence of values to vary the
 appropriate variable, either \code{n} or \code{delta}.}
 
-\item{n}{\code{integer(1)}. The value for the number of samples
-per group to hold constant.}
+\item{n}{\code{integer(1)}. The sample size.}
 
-\item{delta}{\code{double(1)}. The value for the effect size to hold constant.}
+\item{delta}{\code{double(1)}. The effect size.}
 
 \item{nsim}{\code{integer(1)}. Number of simulations to perform
-in estimating \eqn{1 - \beta}.}
+in estimating power, (\eqn{1 - \beta}).}
 
 \item{reps}{\code{integer(1)}. Number of simulations \emph{per box} to generate,
 i.e. number of points within each simulation box.}

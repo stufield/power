@@ -6,24 +6,25 @@
 \alias{plot.fisher_power_curve}
 \title{Create a Power Curve for Fisher's Exact}
 \usage{
-fisher_power_curve(n, p = 0.85, p_diff = -0.1, nsim = 200L, ...)
+fisher_power_curve(n_vec, p = 0.85, p_diff = -0.1, nsim = 200L, ...)
 
 \method{print}{fisher_power_curve}(x, ...)
 
 \method{plot}{fisher_power_curve}(x, ...)
 }
 \arguments{
-\item{n}{\code{integer(n)}. A vector of sample sizes per group.}
+\item{n_vec}{\code{integer(n)}. A sequence of sample sizes per group
+to evaluate the corresponding power.}
 
 \item{p}{\code{double(1)}. Binomial probability of group 1 (the base group).}
 
-\item{p_diff}{\code{double(1)} in \verb{[-1, 1]}. The difference from \code{p}
+\item{p_diff}{\code{double(1)} in \verb{(-1, 1)}. The difference from \code{p}
 of group 2. Can be negative.}
 
 \item{nsim}{\code{integer(1)}. Number of simulations to perform
-in estimating \eqn{1 - \beta}.}
+in estimating power, (\eqn{1 - \beta}).}
 
-\item{...}{Passed to \code{\link[=fisher_power]{fisher_power()}}.}
+\item{...}{Arguments passed to \code{\link[=fisher_power]{fisher_power()}}.}
 
 \item{x}{A \code{fisher_power_curve} class object.}
 }

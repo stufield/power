@@ -16,9 +16,12 @@ fisher_power(p1, p2, n1, n2, nsim = 200L, alpha = 0.05, ...)
 \item{n2}{The group 2 sample size (column 2).}
 
 \item{nsim}{\code{integer(1)}. Number of simulations to perform
-in estimating \eqn{1 - \beta}.}
+in estimating power, (\eqn{1 - \beta}).}
 
-\item{alpha}{\code{double(1)}. The significance threshold (\eqn{\alpha}).}
+\item{alpha}{\code{double(1)}. The significance threshold (\eqn{\alpha}),
+the probability of a significant result given the null hypothesis,
+i.e. a false positive. If desired, Bonferroni correction should
+be implemented here.}
 
 \item{...}{Passed to the underlying test, i.e. \code{\link[=fisher.test]{fisher.test()}},
 \code{\link[=t.test]{t.test()}}, etc.,  e.g. \verb{alternative =}.}

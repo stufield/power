@@ -5,7 +5,7 @@
 #'
 #' @rdname ks
 #'
-#' @param x `numeric(n)` in \verb{[0, 1]}. KS-distance(s).
+#' @param x `numeric(n)` in \verb{[0, 1]}. A sequences of KS-distance(s).
 #'   Or a `ks_pwr_table` object, from call to [ks_power_table()],
 #'   which is a `tibble` with `n` and `power`.
 #'
@@ -15,6 +15,8 @@
 #'
 #' @examples
 #' ks2delta(0.45)
+#'
+#' ks2delta(seq(0.1, 0.9, length.out = 5))
 #' @importFrom stats qnorm
 #' @export
 ks2delta <- function(x) {
@@ -32,17 +34,13 @@ ks2delta <- function(x) {
 #'
 #' @rdname ks
 #'
-#' @param power `numeric(n)` in \verb{(0, 1)}. Which level(s)
-#'   of power to evaluate the required samples size.
-#' @param n_vec `integer(n)`. Which sample sizes per group
-#'   to evaluate the corresponding power.
-#' @param bonferroni `integer(1)`. Optional Bonferroni correction to apply.
+#' @inheritParams params
 #'
 #' @return A list of:
 #'   \item{n}{A data frame of the number of samples required in each
 #'     comparison group to detect an effect corresponding to a given set of
 #'     sens/spec values (60/60 to 90/90) and given vector of power values
-#'     (default `power = seq(0.6, 0.95, 0.05)`).
+#'     (default `power_vec = seq(0.6, 0.95, 0.05)`).
 #'     The corresponding KS-distances of the sens/spec values are also included.}
 #'   \item{power}{A data frame containing
 #'     the power to detect an effect corresponding to a given set of sens/spec
@@ -55,15 +53,15 @@ ks2delta <- function(x) {
 #' @seealso [stats::power.t.test()], [ks2delta()]
 #'
 #' @examples
-#' table <- ks_power_table()
-#' table
+#' tables <- ks_power_table()
+#' tables
 #' @importFrom helpr set_Names
 #' @importFrom stats power.t.test
 #' @importFrom tibble as_tibble enframe
 #' @export
-ks_power_table <- function(power = seq(0.6, 0.95, 0.05),
+ks_power_table <- function(power_vec = seq(0.6, 0.95, 0.05),
                            n_vec = seq(20, 100, 10),
-                           bonferroni = 1) {
+                           alpha = 0.05) {
 
   ss        <- seq(0.6, 0.9, by = 0.01) # sens/spec vector
   ss_names  <- sprintf("%s/%s", ss * 100, ss * 100)
@@ -71,20 +69,20 @@ ks_power_table <- function(power = seq(0.6, 0.95, 0.05),
   delta_vec <- ks2delta(ks_v)    # vector: effect sizes corresponding to ks dist
   base <- enframe(set_Names(ks_v, ss_names), name = "SS", value = "KS")
 
-  tbl_n <- expand.grid(delta_vec, power) |>
+  tbl_n <- expand.grid(delta_vec, power_vec) |>
     set_Names(c("delta", "power")) |>
     apply(1, function(i) {
-    power.t.test(n = NULL, power = i["power"], delta = i["delta"],
-                 sig.level = 0.05 / bonferroni)$n
+      power.t.test(n = NULL, power = i["power"],
+                   delta = i["delta"], sig.level = alpha)$n
     }) |> matrix(nrow = length(delta_vec),
-                 dimnames = list(NULL, sprintf("power=%0.2f", power))) |>
+                 dimnames = list(NULL, sprintf("power=%0.2f", power_vec))) |>
     as_tibble()
 
   tbl_pwr <- expand.grid(delta_vec, n_vec) |>
     set_Names(c("delta", "n")) |>
     apply(1, function(i) {
     power.t.test(power = NULL, n = i["n"], delta = i["delta"],
-                 sig.level = 0.05 / bonferroni)$power
+                 sig.level = alpha)$power
     }) |> matrix(nrow = length(delta_vec),
                  dimnames = list(NULL, sprintf("n=%i", n_vec))) |>
     as_tibble()
@@ -115,9 +113,9 @@ ks_power_table <- function(power = seq(0.6, 0.95, 0.05),
 #' @param ... Additional arguments as requpred by the [plot()] generic.
 #' @examples
 #' # S3 plot method
-#' plot(table)
+#' plot(tables)
 #'
-#' plot(table, plot_power = FALSE)
+#' plot(tables, plot_power = FALSE)
 #' @importFrom ggplot2 ggplot aes geom_line geom_point guides labs
 #' @importFrom ggplot2 guide_legend scale_color_manual guide_axis
 #' @export

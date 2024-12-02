@@ -9,25 +9,28 @@
 ks2delta(x)
 
 ks_power_table(
-  power = seq(0.6, 0.95, 0.05),
+  power_vec = seq(0.6, 0.95, 0.05),
   n_vec = seq(20, 100, 10),
-  bonferroni = 1
+  alpha = 0.05
 )
 
 \method{plot}{ks_pwr_table}(x, plot_power = TRUE, ...)
 }
 \arguments{
-\item{x}{\code{numeric(n)} in \verb{[0, 1]}. KS-distance(s).
+\item{x}{\code{numeric(n)} in \verb{[0, 1]}. A sequences of KS-distance(s).
 Or a \code{ks_pwr_table} object, from call to \code{\link[=ks_power_table]{ks_power_table()}},
 which is a \code{tibble} with \code{n} and \code{power}.}
 
-\item{power}{\code{numeric(n)} in \verb{(0, 1)}. Which level(s)
-of power to evaluate the required samples size.}
+\item{power_vec}{\code{numeric(n)} in \verb{(0, 1)}. A sequence of
+power levels to evaluate the required samples size.}
 
-\item{n_vec}{\code{integer(n)}. Which sample sizes per group
+\item{n_vec}{\code{integer(n)}. A sequence of sample sizes per group
 to evaluate the corresponding power.}
 
-\item{bonferroni}{\code{integer(1)}. Optional Bonferroni correction to apply.}
+\item{alpha}{\code{double(1)}. The significance threshold (\eqn{\alpha}),
+the probability of a significant result given the null hypothesis,
+i.e. a false positive. If desired, Bonferroni correction should
+be implemented here.}
 
 \item{plot_power}{\code{logical(1)}. Should the \code{power} data frame be plotted?
 If \code{FALSE}, the sample sizes are plotted.}
@@ -41,7 +44,7 @@ A list of:
 \item{n}{A data frame of the number of samples required in each
 comparison group to detect an effect corresponding to a given set of
 sens/spec values (60/60 to 90/90) and given vector of power values
-(default \code{power = seq(0.6, 0.95, 0.05)}).
+(default \code{power_vec = seq(0.6, 0.95, 0.05)}).
 The corresponding KS-distances of the sens/spec values are also included.}
 \item{power}{A data frame containing
 the power to detect an effect corresponding to a given set of sens/spec
@@ -68,12 +71,14 @@ is a varying sensitivity/specificity value.
 }
 \examples{
 ks2delta(0.45)
-table <- ks_power_table()
-table
-# S3 plot method
-plot(table)
 
-plot(table, plot_power = FALSE)
+ks2delta(seq(0.1, 0.9, length.out = 5))
+tables <- ks_power_table()
+tables
+# S3 plot method
+plot(tables)
+
+plot(tables, plot_power = FALSE)
 }
 \seealso{
 \code{\link[=qnorm]{qnorm()}}

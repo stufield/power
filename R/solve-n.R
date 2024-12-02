@@ -10,6 +10,7 @@
 #'   or [t_power_curve()].
 #' @param pwr `double(1)` in \verb{(0, 1)}.
 #'   The power to be interpolated.
+#'
 #' @examples
 #' tbl <- fisher_power_curve(seq(50, 400, 25))
 #' solve_n(tbl, 0.85)

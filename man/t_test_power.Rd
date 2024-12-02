@@ -9,12 +9,15 @@ t_test_power(n, delta, nsim = 200L, alpha = 0.05, ...)
 \arguments{
 \item{n}{\code{integer(1)}. The sample size.}
 
-\item{delta}{\code{numeric(1)}. The effect size.}
+\item{delta}{\code{double(1)}. The effect size.}
 
 \item{nsim}{\code{integer(1)}. Number of simulations to perform
-in estimating \eqn{1 - \beta}.}
+in estimating power, (\eqn{1 - \beta}).}
 
-\item{alpha}{\code{double(1)}. The significance threshold (\eqn{\alpha}).}
+\item{alpha}{\code{double(1)}. The significance threshold (\eqn{\alpha}),
+the probability of a significant result given the null hypothesis,
+i.e. a false positive. If desired, Bonferroni correction should
+be implemented here.}
 
 \item{...}{Passed to the underlying test, i.e. \code{\link[=fisher.test]{fisher.test()}},
 \code{\link[=t.test]{t.test()}}, etc.,  e.g. \verb{alternative =}.}

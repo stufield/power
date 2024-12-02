@@ -3,6 +3,7 @@
 #' Calculates the empirical power of a test through simulated data
 #'   for a given effect size of sample size (per group).
 #'
+#' @inheritParams params
 #' @inheritParams t_test_power
 #'
 #' @param p1 The first proportion (group 1).

@@ -5,15 +5,12 @@
 #'   while holding sample or effect size (whichever is not
 #'   defined in `variable`) constant.
 #'
-#' @inheritParams t_test_power
+#' @inheritParams params
 #'
 #' @param sequence `numeric(n)`. A sequence of values to vary the
 #'   appropriate variable, either `n` or `delta`.
 #' @param reps `integer(1)`. Number of simulations *per box* to generate,
 #'   i.e. number of points within each simulation box.
-#' @param n `integer(1)`. The value for the number of samples
-#'   per group to hold constant.
-#' @param delta `double(1)`. The value for the effect size to hold constant.
 #' @param verbose `logical(1)`. Should function be run in verbose mode?
 #' @param ... Additional arguments passed either to [t_test_power()],
 #'   only `alpha =`, or to the S3 plotting method.
