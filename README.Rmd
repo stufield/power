@@ -35,7 +35,7 @@ The `power` package contains some simple functions to empirically
 simulate and estimate statistical power under various statistical
 test conditions. In general, simulations are performed with *known*
 effect sizes or differences, and the proportion of detected significant
-*p*-values represents the empirical power, i.e. $1 - \beta$ or 
+*p*-values represents the empirical power, i.e. $$1 - \beta$$ or
 `1 - TypeII` error.
 
 The goal is typically get an idea of the required sample size
@@ -53,7 +53,11 @@ but you can install the latest version from
 [github](https://github.com/stufield/power) via:
 
 ```{r install-github, eval = FALSE}
+# current dev version
 remotes::install_github("stufield/power")
+
+# or a specific version
+remotes::install_github("stufield/power@v0.0.1")
 ```
 
 
