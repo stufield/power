@@ -23,7 +23,7 @@ The `power` package contains some simple functions to empirically
 simulate and estimate statistical power under various statistical test
 conditions. In general, simulations are performed with *known* effect
 sizes or differences, and the proportion of detected significant
-*p*-values represents the empirical power, i.e. $1 - \beta$ or
+*p*-values represents the empirical power, i.e. $1-\beta$ or
 `1 - TypeII` error.
 
 The goal is typically get an idea of the required sample size given an
@@ -38,7 +38,11 @@ The `power` package is not currently on
 version from [github](https://github.com/stufield/power) via:
 
 ``` r
+# current dev version
 remotes::install_github("stufield/power")
+
+# or a specific version
+remotes::install_github("stufield/power@v0.0.1")
 ```
 
 ## Loading `power`
@@ -191,7 +195,7 @@ equal proportions across the margins (rows x cols):
 
 ``` r
 fisher_power(0.85, 0.75, 200, 200, nsim = 200L)
-#> [1] 0.68
+#> [1] 0.665
 ```
 
 ### Fisher’s Power Curve
@@ -225,7 +229,7 @@ gg_pwr
 pwr_n <- solve_n(f_tbl, 0.8)
 pwr_n
 #>   power       n 
-#>   0.800 265.899
+#>   0.800 264.533
 ```
 
 Visually check the curve and add the solution to the `ggplot`.
